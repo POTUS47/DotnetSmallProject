@@ -4,9 +4,7 @@ using WTEMaui.Views;
 
 namespace WTEMaui
 {
-    private readonly TestService _testService;
-
-    public MainPage(TestService testService)
+    public partial class MainPage : ContentPage
     {
         int count = 0;
         private User? _currentUser;
@@ -21,7 +19,7 @@ namespace WTEMaui
         protected override async void OnNavigatedTo(NavigatedToEventArgs args)
         {
             base.OnNavigatedTo(args);
-            
+
             // 从Shell参数中获取用户名
             var parameters = Shell.Current.CurrentState.Location.ToString();
             if (parameters.Contains("user="))
@@ -29,7 +27,7 @@ namespace WTEMaui
                 var username = parameters.Split("user=")[1].Split("&")[0];
                 _currentUser = await _databaseService.GetUserByUsernameAsync(username);
             }
-            
+
             UpdateUserInfo();
         }
 
@@ -62,7 +60,7 @@ namespace WTEMaui
         private async void OnLogoutClicked(object sender, EventArgs e)
         {
             var result = await DisplayAlert("确认退出", "确定要退出登录吗？", "确定", "取消");
-            
+
             if (result)
             {
                 // 返回登录页面

@@ -8,7 +8,7 @@
         <VerticalStackLayout
             Padding="30,0"
             Spacing="25">
-            
+
             <!-- 用户信息区域 -->
             <Frame BorderColor="#512BD4" CornerRadius="15" Padding="20" BackgroundColor="#F0F0F0">
                 <VerticalStackLayout Spacing="10">
@@ -16,12 +16,12 @@
                            Style="{StaticResource Headline}" 
                            HorizontalOptions="Center"
                            TextColor="#512BD4" />
-                    
+
                     <Label x:Name="WelcomeLabel"
                            Text="欢迎回来！"
                            Style="{StaticResource SubHeadline}"
                            HorizontalOptions="Center" />
-                    
+
                     <Label x:Name="UserInfoLabel"
                            Text=""
                            HorizontalOptions="Center"
