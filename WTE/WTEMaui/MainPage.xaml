@@ -1,12 +1,35 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="WTEMaui.MainPage">
+             x:Class="WTEMaui.MainPage"
+             Title="主页">
 
     <ScrollView>
         <VerticalStackLayout
             Padding="30,0"
             Spacing="25">
+            
+            <!-- 用户信息区域 -->
+            <Frame BorderColor="#512BD4" CornerRadius="15" Padding="20" BackgroundColor="#F0F0F0">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="用户信息" 
+                           Style="{StaticResource Headline}" 
+                           HorizontalOptions="Center"
+                           TextColor="#512BD4" />
+                    
+                    <Label x:Name="WelcomeLabel"
+                           Text="欢迎回来！"
+                           Style="{StaticResource SubHeadline}"
+                           HorizontalOptions="Center" />
+                    
+                    <Label x:Name="UserInfoLabel"
+                           Text=""
+                           HorizontalOptions="Center"
+                           FontSize="14"
+                           TextColor="Gray" />
+                </VerticalStackLayout>
+            </Frame>
+
             <Image
                 Source="dotnet_bot.png"
                 HeightRequest="185"
@@ -30,6 +53,29 @@
                 SemanticProperties.Hint="Counts the number of times you click"
                 Clicked="OnCounterClicked"
                 HorizontalOptions="Fill" />
+
+            <!-- 退出登录按钮 -->
+            <Button
+                x:Name="LogoutBtn"
+                Text="退出登录"
+                BackgroundColor="#FF4444"
+                TextColor="White"
+                CornerRadius="10"
+                HeightRequest="50"
+                Clicked="OnLogoutClicked"
+                SemanticProperties.Hint="退出登录" />
+
+            <!-- 用户管理按钮 -->
+            <Button
+                x:Name="UserManagementBtn"
+                Text="用户管理"
+                BackgroundColor="#512BD4"
+                TextColor="White"
+                CornerRadius="10"
+                HeightRequest="50"
+                Clicked="OnUserManagementClicked"
+                SemanticProperties.Hint="用户管理" />
+
         </VerticalStackLayout>
     </ScrollView>
 

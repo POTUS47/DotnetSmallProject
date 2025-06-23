@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="WTEMaui.Views.UserManagementPage"
+             Title="用户管理">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- 标题栏 -->
+        <StackLayout Grid.Row="0" Padding="20" BackgroundColor="#512BD4">
+            <Label Text="用户管理" 
+                   TextColor="White" 
+                   FontSize="20" 
+                   HorizontalOptions="Center" />
+        </StackLayout>
+
+        <!-- 用户列表 -->
+        <CollectionView Grid.Row="1" 
+                        x:Name="UserCollectionView"
+                        ItemsSource="{Binding Users}"
+                        Margin="10">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="5" Padding="15" BorderColor="Gray" CornerRadius="10">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Label Grid.Row="0" Grid.Column="0" 
+                                   Text="{Binding Username}" 
+                                   FontSize="16" 
+                                   FontAttributes="Bold" />
+                            
+                            <Label Grid.Row="1" Grid.Column="0" 
+                                   Text="{Binding Email}" 
+                                   FontSize="14" 
+                                   TextColor="Gray" />
+                            
+                            <Label Grid.Row="2" Grid.Column="0" 
+                                   Text="{Binding CreatedAt, StringFormat='注册时间: {0:yyyy-MM-dd HH:mm}'}" 
+                                   FontSize="12" 
+                                   TextColor="Gray" />
+
+                            <Button Grid.Row="0" Grid.Column="1" Grid.RowSpan="3"
+                                    Text="删除" 
+                                    BackgroundColor="Red" 
+                                    TextColor="White"
+                                    CornerRadius="5"
+                                    HeightRequest="30"
+                                    WidthRequest="60"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=DeleteUserCommand}"
+                                    CommandParameter="{Binding Id}" />
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- 加载指示器 -->
+        <ActivityIndicator Grid.Row="1" 
+                           x:Name="LoadingIndicator"
+                           IsRunning="True"
+                           IsVisible="False"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+    </Grid>
+
+</ContentPage> 
