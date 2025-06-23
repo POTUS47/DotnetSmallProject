@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="WTEMaui.Views.RegisterPage"
+             Title="注册">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="30,0" Spacing="25">
+            
+            <!-- Logo -->
+            <Image Source="dotnet_bot.png"
+                   HeightRequest="100"
+                   Aspect="AspectFit"
+                   HorizontalOptions="Center"
+                   Margin="0,20,0,0" />
+
+            <!-- 标题 -->
+            <Label Text="创建新账号"
+                   Style="{StaticResource Headline}"
+                   HorizontalOptions="Center"
+                   SemanticProperties.HeadingLevel="Level1" />
+
+            <!-- 用户名输入框 -->
+            <Frame BorderColor="Gray" CornerRadius="10" Padding="15">
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="用户名" FontSize="14" TextColor="Gray" />
+                    <Entry x:Name="UsernameEntry" 
+                           Placeholder="请输入用户名"
+                           Text="{Binding Username}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- 邮箱输入框 -->
+            <Frame BorderColor="Gray" CornerRadius="10" Padding="15">
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="邮箱" FontSize="14" TextColor="Gray" />
+                    <Entry x:Name="EmailEntry" 
+                           Placeholder="请输入邮箱"
+                           Keyboard="Email"
+                           Text="{Binding Email}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- 密码输入框 -->
+            <Frame BorderColor="Gray" CornerRadius="10" Padding="15">
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="密码" FontSize="14" TextColor="Gray" />
+                    <Entry x:Name="PasswordEntry" 
+                           Placeholder="请输入密码"
+                           IsPassword="True"
+                           Text="{Binding Password}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- 确认密码输入框 -->
+            <Frame BorderColor="Gray" CornerRadius="10" Padding="15">
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="确认密码" FontSize="14" TextColor="Gray" />
+                    <Entry x:Name="ConfirmPasswordEntry" 
+                           Placeholder="请再次输入密码"
+                           IsPassword="True"
+                           Text="{Binding ConfirmPassword}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- 注册按钮 -->
+            <Button Text="注册"
+                    BackgroundColor="#512BD4"
+                    TextColor="White"
+                    CornerRadius="10"
+                    HeightRequest="50"
+                    Clicked="OnRegisterClicked"
+                    SemanticProperties.Hint="点击注册" />
+
+            <!-- 返回登录链接 -->
+            <Label Text="已有账号？返回登录"
+                   TextColor="#512BD4"
+                   HorizontalOptions="Center"
+                   FontSize="16">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnBackToLoginTapped" />
+                </Label.GestureRecognizers>
+            </Label>
+
+            <!-- 状态信息 -->
+            <Label x:Name="StatusLabel"
+                   Text=""
+                   HorizontalOptions="Center"
+                   TextColor="Red"
+                   IsVisible="False" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage> 

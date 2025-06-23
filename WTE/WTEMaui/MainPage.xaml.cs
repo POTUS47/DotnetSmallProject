@@ -1,65 +1,79 @@
-﻿//using DataAccessLib.Services;
+﻿using WTEMaui.Models;
+using WTEMaui.Services;
+using WTEMaui.Views;
 
-//{
-//    public partial class MainPage : ContentPage
-//    {
-//        int count = 0;
-
-//        public MainPage()
-//        {
-//            InitializeComponent();
-//        }
-
-//        private void OnCounterClicked(object sender, EventArgs e)
-//        {
-//            count++;
-
-//            if (count == 1)
-//                CounterBtn.Text = $"Clicked {count} time";
-//            else
-//                CounterBtn.Text = $"Clicked {count} times";
-
-//            SemanticScreenReader.Announce(CounterBtn.Text);
-//        }
-//    }
-
-//}
-
-using DataAccessLib.Services;
-using Microsoft.EntityFrameworkCore;
-namespace WTEMaui;
-public partial class MainPage : ContentPage
+namespace WTEMaui
 {
     private readonly TestService _testService;
 
     public MainPage(TestService testService)
     {
-        InitializeComponent();
-        _testService = testService;
-    }
+        int count = 0;
+        private User? _currentUser;
+        private readonly DatabaseService _databaseService;
 
-    protected override async void OnAppearing()
-    {
-        base.OnAppearing();
-        try
+        public MainPage()
         {
-            var canConnect = await _testService.CanConnectAsync();
-            await DisplayAlert("数据库连接测试",
-                canConnect ? "成功!" : "失败!", "确定");
+            InitializeComponent();
+            _databaseService = new DatabaseService();
+        }
 
-            if (canConnect)
+        protected override async void OnNavigatedTo(NavigatedToEventArgs args)
+        {
+            base.OnNavigatedTo(args);
+            
+            // 从Shell参数中获取用户名
+            var parameters = Shell.Current.CurrentState.Location.ToString();
+            if (parameters.Contains("user="))
             {
-                var newUser = await _testService.AddTestUserAsync();
-                var users = await _testService.GetAllUsersAsync();
+                var username = parameters.Split("user=")[1].Split("&")[0];
+                _currentUser = await _databaseService.GetUserByUsernameAsync(username);
+            }
+            
+            UpdateUserInfo();
+        }
 
-                await DisplayAlert("测试结果",
-                    $"新增用户: {newUser.Username}\n总用户数: {users.Count}", "确定");
+        private void UpdateUserInfo()
+        {
+            if (_currentUser != null)
+            {
+                WelcomeLabel.Text = $"欢迎回来，{_currentUser.Username}！";
+                UserInfoLabel.Text = $"邮箱: {_currentUser.Email}\n注册时间: {_currentUser.CreatedAt:yyyy-MM-dd HH:mm}\n最后登录: {_currentUser.LastLoginAt:yyyy-MM-dd HH:mm}";
+            }
+            else
+            {
+                WelcomeLabel.Text = "欢迎使用！";
+                UserInfoLabel.Text = "未登录用户";
             }
         }
-        catch (Exception ex)
+
+        private void OnCounterClicked(object sender, EventArgs e)
         {
-            await DisplayAlert("发生错误",
-                $"类型: {ex.GetType().Name}\n消息: {ex.Message}", "确定");
+            count++;
+
+            if (count == 1)
+                CounterBtn.Text = $"Clicked {count} time";
+            else
+                CounterBtn.Text = $"Clicked {count} times";
+
+            SemanticScreenReader.Announce(CounterBtn.Text);
+        }
+
+        private async void OnLogoutClicked(object sender, EventArgs e)
+        {
+            var result = await DisplayAlert("确认退出", "确定要退出登录吗？", "确定", "取消");
+            
+            if (result)
+            {
+                // 返回登录页面
+                await Shell.Current.GoToAsync("//LoginPage");
+            }
+        }
+
+        private async void OnUserManagementClicked(object sender, EventArgs e)
+        {
+            // 跳转到用户管理页面
+            await Shell.Current.GoToAsync(nameof(UserManagementPage));
         }
     }
 }

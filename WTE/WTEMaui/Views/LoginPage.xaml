@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="WTEMaui.Views.LoginPage"
+             Title="登录">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="30,0" Spacing="25">
+            
+            <!-- Logo -->
+            <Image Source="dotnet_bot.png"
+                   HeightRequest="120"
+                   Aspect="AspectFit"
+                   HorizontalOptions="Center"
+                   Margin="0,20,0,0" />
+
+            <!-- 标题 -->
+            <Label Text="欢迎登录"
+                   Style="{StaticResource Headline}"
+                   HorizontalOptions="Center"
+                   SemanticProperties.HeadingLevel="Level1" />
+
+            <!-- 用户名输入框 -->
+            <Frame BorderColor="Gray" CornerRadius="10" Padding="15">
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="用户名" FontSize="14" TextColor="Gray" />
+                    <Entry x:Name="UsernameEntry" 
+                           Placeholder="请输入用户名"
+                           Text="{Binding Username}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- 密码输入框 -->
+            <Frame BorderColor="Gray" CornerRadius="10" Padding="15">
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="密码" FontSize="14" TextColor="Gray" />
+                    <Entry x:Name="PasswordEntry" 
+                           Placeholder="请输入密码"
+                           IsPassword="True"
+                           Text="{Binding Password}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- 登录按钮 -->
+            <Button Text="登录"
+                    BackgroundColor="#512BD4"
+                    TextColor="White"
+                    CornerRadius="10"
+                    HeightRequest="50"
+                    Clicked="OnLoginClicked"
+                    SemanticProperties.Hint="点击登录" />
+
+            <!-- 注册链接 -->
+            <Label Text="还没有账号？点击注册"
+                   TextColor="#512BD4"
+                   HorizontalOptions="Center"
+                   FontSize="16">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnRegisterTapped" />
+                </Label.GestureRecognizers>
+            </Label>
+
+            <!-- 状态信息 -->
+            <Label x:Name="StatusLabel"
+                   Text=""
+                   HorizontalOptions="Center"
+                   TextColor="Red"
+                   IsVisible="False" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage> 
