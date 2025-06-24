@@ -48,9 +48,9 @@ namespace WTEMaui.Views
                     
                     // 延迟一下再跳转，让用户看到成功消息
                     await Task.Delay(1000);
-                    
-                    // 跳转到主页面，传递用户信息
-                    await Shell.Current.GoToAsync($"{nameof(MainPage)}?user={Uri.EscapeDataString(user.Username)}");
+
+                    // 设置新的主页面为带底部 Tab 的 Shell 页面
+                    Application.Current.MainPage = new MainTabShell();
                 }
                 else
                 {
