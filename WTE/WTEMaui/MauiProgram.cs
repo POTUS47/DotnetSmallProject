@@ -36,12 +36,18 @@ namespace WTEMaui
                     "sk-0ea4236a89b8411eb0044e4931423862", // 替换为你的API密钥
                     sp.GetService<ILogger<ImageRecognitionService>>()));
 
+            // 注册OSS服务
+            builder.Services.AddSingleton<OssService>();
+
             // 注册服务
             builder.Services.AddScoped<TestService>();
             builder.Services.AddScoped<UserService>();
+            builder.Services.AddScoped<MealService>();
+            
             builder.Services.AddTransient<DashboardPage>(serviceProvider =>
             new DashboardPage(
                 serviceProvider.GetRequiredService<ImageRecognitionService>(),
+                serviceProvider.GetRequiredService<OssService>(),
                 serviceProvider.GetRequiredService<ILogger<DashboardPage>>()));
             // 注册页面
             builder.Services.AddTransient<MainPage>();
