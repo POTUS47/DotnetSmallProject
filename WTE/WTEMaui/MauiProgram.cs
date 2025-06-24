@@ -4,6 +4,7 @@ using DataAccessLib.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using WTEMaui.Views;
 
 namespace WTEMaui
 {
@@ -28,8 +29,14 @@ namespace WTEMaui
                     new MySqlServerVersion(new Version(8, 0, 0)));
             });
 
+            // 注册服务
             builder.Services.AddScoped<TestService>();
+            builder.Services.AddScoped<UserService>();
+            
+            // 注册页面
             builder.Services.AddTransient<MainPage>();
+            builder.Services.AddTransient<LoginPage>();
+            builder.Services.AddTransient<RegisterPage>();
 
 #if DEBUG
             builder.Logging.AddDebug();

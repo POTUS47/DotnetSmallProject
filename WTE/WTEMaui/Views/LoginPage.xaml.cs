@@ -1,22 +1,28 @@
-using WTEMaui.Services;
-using WTEMaui.Models;
+using DataAccessLib.Services;
+using DataAccessLib.Models;
+using WTEMaui.Views;
+using Microsoft.Extensions.Logging;
 
 namespace WTEMaui.Views
 {
     public partial class LoginPage : ContentPage
     {
-        private readonly DatabaseService _databaseService;
+        private readonly UserService _userService;
+        private readonly ILogger<LoginPage> _logger;
 
-        public LoginPage()
+        public LoginPage(UserService userService, ILogger<LoginPage> logger = null)
         {
             InitializeComponent();
-            _databaseService = new DatabaseService();
+            _userService = userService;
+            _logger = logger;
         }
 
         private async void OnLoginClicked(object sender, EventArgs e)
         {
             var username = UsernameEntry.Text?.Trim();
             var password = PasswordEntry.Text?.Trim();
+
+            _logger?.LogInformation("登录按钮被点击，用户名: {Username}", username);
 
             // 验证输入
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
@@ -30,18 +36,21 @@ namespace WTEMaui.Views
 
             try
             {
+                _logger?.LogInformation("开始调用LoginAsync方法");
+                
                 // 尝试登录
-                var user = await _databaseService.LoginAsync(username, password);
+                var user = await _userService.LoginAsync(username, password);
 
                 if (user != null)
                 {
+                    _logger?.LogInformation("登录成功，准备跳转页面");
                     ShowStatus("登录成功！", false);
                     
                     // 延迟一下再跳转，让用户看到成功消息
                     await Task.Delay(1000);
                     
                     // 跳转到主页面，传递用户信息
-                    await Shell.Current.GoToAsync($"{nameof(MainPage)}?user={user.Username}");
+                    await Shell.Current.GoToAsync($"{nameof(MainPage)}?user={Uri.EscapeDataString(user.Username)}");
                 }
                 else
                 {
@@ -50,6 +59,8 @@ namespace WTEMaui.Views
             }
             catch (Exception ex)
             {
+                _logger?.LogError(ex, "登录过程中发生异常，用户名: {Username}, 异常类型: {ExceptionType}, 消息: {Message}", 
+                    username, ex.GetType().Name, ex.Message);
                 ShowStatus($"登录失败: {ex.Message}", true);
             }
         }
@@ -67,4 +78,4 @@ namespace WTEMaui.Views
             StatusLabel.IsVisible = true;
         }
     }
-} 
+}

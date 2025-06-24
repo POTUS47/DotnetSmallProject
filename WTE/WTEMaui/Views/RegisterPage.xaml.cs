@@ -1,16 +1,19 @@
-using WTEMaui.Services;
+using DataAccessLib.Services;
+using Microsoft.Extensions.Logging;
 using System.Text.RegularExpressions;
 
 namespace WTEMaui.Views
 {
     public partial class RegisterPage : ContentPage
     {
-        private readonly DatabaseService _databaseService;
+        private readonly UserService _userService;
+        private readonly ILogger<RegisterPage> _logger;
 
-        public RegisterPage()
+        public RegisterPage(UserService userService, ILogger<RegisterPage> logger = null)
         {
             InitializeComponent();
-            _databaseService = new DatabaseService();
+            _userService = userService;
+            _logger = logger;
         }
 
         private async void OnRegisterClicked(object sender, EventArgs e)
@@ -19,6 +22,8 @@ namespace WTEMaui.Views
             var email = EmailEntry.Text?.Trim();
             var password = PasswordEntry.Text?.Trim();
             var confirmPassword = ConfirmPasswordEntry.Text?.Trim();
+
+            _logger?.LogInformation("注册按钮被点击，用户名: {Username}, 邮箱: {Email}", username, email);
 
             // 验证输入
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(email) || 
@@ -61,11 +66,14 @@ namespace WTEMaui.Views
 
             try
             {
+                _logger?.LogInformation("开始调用RegisterAsync方法");
+                
                 // 尝试注册
-                var success = await _databaseService.RegisterUserAsync(username, password, email);
+                var user = await _userService.RegisterAsync(username, email, password);
 
-                if (success)
+                if (user != null)
                 {
+                    _logger?.LogInformation("注册成功，用户ID: {UserId}", user.UserId);
                     ShowStatus("注册成功！正在跳转到登录页面...", false);
                     
                     // 延迟一下再跳转
@@ -76,11 +84,13 @@ namespace WTEMaui.Views
                 }
                 else
                 {
-                    ShowStatus("用户名或邮箱已存在", true);
+                    ShowStatus("注册失败，请重试", true);
                 }
             }
             catch (Exception ex)
             {
+                _logger?.LogError(ex, "注册过程中发生异常，用户名: {Username}, 邮箱: {Email}, 异常类型: {ExceptionType}, 消息: {Message}", 
+                    username, email, ex.GetType().Name, ex.Message);
                 ShowStatus($"注册失败: {ex.Message}", true);
             }
         }
@@ -111,4 +121,4 @@ namespace WTEMaui.Views
             }
         }
     }
-} 
+}

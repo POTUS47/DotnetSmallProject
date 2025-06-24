@@ -1,6 +1,7 @@
 ﻿using DataAccessLib.Data;
 using DataAccessLib.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -9,10 +10,12 @@ namespace DataAccessLib.Services
     public class UserService
     {
         private readonly AppDbContext _context;
+        private readonly ILogger<UserService> _logger;
 
-        public UserService(AppDbContext context)
+        public UserService(AppDbContext context, ILogger<UserService> logger = null)
         {
             _context = context;
+            _logger = logger;
         }
 
         // 密码加密方法
@@ -52,13 +55,59 @@ namespace DataAccessLib.Services
         /// </summary>
         public async Task<User> LoginAsync(string usernameOrEmail, string password)
         {
+            _logger?.LogInformation("[DEBUG] 开始登录验证，输入的用户名/邮箱: {UsernameOrEmail}", usernameOrEmail);
+            _logger?.LogInformation("[DEBUG] 输入的密码长度: {PasswordLength}", password?.Length ?? 0);
+            
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Username == usernameOrEmail || u.Email == usernameOrEmail);
-
-            if (user == null || user.Password != HashPassword(password))
+            
+            if (user == null)
+            {
+                _logger?.LogWarning("[DEBUG] 未找到用户: {UsernameOrEmail}", usernameOrEmail);
                 throw new Exception("用户名或密码错误");
+            }
+            
+            _logger?.LogInformation("[DEBUG] 找到用户: ID={UserId}, Username={Username}, Email={Email}", 
+                user.UserId, user.Username, user.Email);
+            
+            var inputPasswordHash = HashPassword(password);
+            _logger?.LogInformation("[DEBUG] 输入密码的哈希值: {InputHash}", inputPasswordHash);
+            _logger?.LogInformation("[DEBUG] 数据库中的密码哈希值: {DbHash}", user.Password);
+            _logger?.LogInformation("[DEBUG] 密码是否匹配: {IsMatch}", user.Password == inputPasswordHash);
+            
+            if (user.Password != inputPasswordHash)
+            {
+                _logger?.LogWarning("[DEBUG] 密码验证失败");
+                throw new Exception("用户名或密码错误");
+            }
 
+            _logger?.LogInformation("[DEBUG] 登录成功，用户: {Username}", user.Username);
             return user;
+        }
+
+        /// <summary>
+        /// 用户身份验证（不抛出异常版本）
+        /// </summary>
+        public async Task<User?> AuthenticateAsync(string usernameOrEmail, string password)
+        {
+            try
+            {
+                return await LoginAsync(usernameOrEmail, password);
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogWarning("身份验证失败: {Message}", ex.Message);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 根据用户名获取用户
+        /// </summary>
+        public async Task<User?> GetByUsernameAsync(string username)
+        {
+            _logger?.LogInformation("根据用户名查找用户: {Username}", username);
+            return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
         }
         #endregion
 
