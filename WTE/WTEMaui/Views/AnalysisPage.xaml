@@ -3,13 +3,30 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="WTEMaui.Views.AnalysisPage"
              Title="分析">
-
-    <ScrollView>
-        <VerticalStackLayout Spacing="20" Padding="20">
-            <Label Text="这是分析页面"
-                   HorizontalOptions="Center"
-                   FontSize="20" />
-        </VerticalStackLayout>
-    </ScrollView>
-
+    <VerticalStackLayout Spacing="16" Padding="16">
+        <!-- 用户信息 -->
+        <Frame CornerRadius="12" Padding="8" BackgroundColor="#F5F5F5">
+            <HorizontalStackLayout Spacing="12">
+                <Image Source="dotnet_bot.png" WidthRequest="48" HeightRequest="48" />
+                <Label Text="{Binding UserName}" FontSize="20" VerticalOptions="Center" />
+            </HorizontalStackLayout>
+        </Frame>
+        <CollectionView ItemsSource="{Binding DailyStats}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="4" Padding="8" BorderColor="#DDD" CornerRadius="8">
+                        <VerticalStackLayout>
+                            <Label Text="{Binding Date}" FontAttributes="Bold" />
+                            <Label Text="{Binding FoodsString}" />
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        <!-- 健康建议 -->
+        <Frame CornerRadius="12" Padding="12" BackgroundColor="#E8F5E9">
+            <Label Text="健康建议" FontAttributes="Bold" FontSize="18" />
+            <Label Text="{Binding HealthAdvice}" FontSize="16" />
+        </Frame>
+    </VerticalStackLayout>
 </ContentPage>

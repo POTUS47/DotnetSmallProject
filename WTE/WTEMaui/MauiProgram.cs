@@ -45,6 +45,7 @@ namespace WTEMaui
             builder.Services.AddScoped<MealService>();
             builder.Services.AddScoped<FoodService>();
             builder.Services.AddScoped<TagService>();
+            builder.Services.AddScoped<AnalysisService>();
             
             builder.Services.AddTransient<DashboardPage>(serviceProvider =>
             new DashboardPage(
