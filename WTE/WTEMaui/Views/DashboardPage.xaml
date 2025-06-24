@@ -2,14 +2,100 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="WTEMaui.Views.DashboardPage"
-             Title="首页">
+             Title="食物识别"
+             BackgroundColor="#F5F5F5">
 
     <ScrollView>
-        <VerticalStackLayout Spacing="20" Padding="20">
-            <Label Text="这是首页"
-                   HorizontalOptions="Center"
-                   FontSize="20" />
-        </VerticalStackLayout>
-    </ScrollView>
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto"
+              RowSpacing="20"
+              Padding="20">
 
+            <!-- 第0行：标题 -->
+            <Label Text="食物识别"
+                   Grid.Row="0"
+                   HorizontalOptions="Center"
+                   FontSize="24"
+                   FontAttributes="Bold"
+                   TextColor="#512BD4"/>
+
+            <!-- 第1行：拍照按钮 -->
+            <Button Text="📷 拍照识别食物"
+                    Grid.Row="1"
+                    BackgroundColor="#512BD4"
+                    TextColor="White"
+                    CornerRadius="10"
+                    HeightRequest="60"
+                    FontSize="18"
+                    Clicked="OnTakePhotoClicked"/>
+
+            <!-- 第2行：图片预览 -->
+            <Frame Grid.Row="2"
+                   CornerRadius="15"
+                   Padding="0"
+                   BorderColor="#DDDDDD"
+                   IsVisible="{Binding Source={x:Reference PreviewImage}, Path=IsVisible}">
+                <Image x:Name="PreviewImage"
+                       Aspect="AspectFill"
+                       HeightRequest="300"/>
+            </Frame>
+
+            <!-- 第3行：识别按钮 -->
+            <Button x:Name="RecognizeButton"
+                    Grid.Row="3"
+                    Text="🔍 开始识别"
+                    BackgroundColor="#512BD4"
+                    TextColor="White"
+                    CornerRadius="10"
+                    HeightRequest="50"
+                    FontSize="16"
+                    IsVisible="False"
+                    Clicked="OnRecognizeClicked"/>
+
+            <!-- 第4行：加载指示器和结果 -->
+            <Grid Grid.Row="4"
+                  RowDefinitions="Auto,Auto"
+                  RowSpacing="10">
+
+                <!-- 加载指示器 -->
+                <ActivityIndicator x:Name="LoadingIndicator"
+                                   Grid.Row="0"
+                                   IsRunning="False"
+                                   Color="#512BD4"
+                                   HorizontalOptions="Center"
+                                   HeightRequest="50"
+                                   WidthRequest="50"/>
+
+                <!-- 识别结果 -->
+                <Frame x:Name="ResultFrame"
+                       Grid.Row="1"
+                       BorderColor="#512BD4"
+                       CornerRadius="10"
+                       Padding="15"
+                       IsVisible="False">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="🍽️ 识别结果" 
+                               FontAttributes="Bold"
+                               FontSize="18"
+                               TextColor="#512BD4"/>
+
+                        <BoxView HeightRequest="1"
+                                 Color="#512BD4"
+                                 Margin="0,5,0,10"/>
+
+                        <Label x:Name="ResultLabel"
+                               FontSize="16"
+                               LineBreakMode="WordWrap"/>
+
+                        <Button Text="✅ 知道了"
+                                BackgroundColor="#512BD4"
+                                TextColor="White"
+                                CornerRadius="5"
+                                HeightRequest="40"
+                                Margin="0,10,0,0"
+                                Clicked="OnDismissResultClicked"/>
+                    </VerticalStackLayout>
+                </Frame>
+            </Grid>
+        </Grid>
+    </ScrollView>
 </ContentPage>
