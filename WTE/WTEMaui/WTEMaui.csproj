@@ -66,6 +66,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\DataAccessLib\DataAccessLib.csproj" />
+	  <ProjectReference Include="..\LLMLib\LLMLib.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
