@@ -1,3 +1,4 @@
+using DataAccessLib.Config;
 using DataAccessLib.Data;
 using DataAccessLib.Models;
 using Microsoft.EntityFrameworkCore;
@@ -501,12 +502,8 @@ namespace DataAccessLib.Services
         {
             try
             {
-                // 注意：当前OssService没有提供删除方法，这里需要添加
-                // _ossService.DeleteFile(ossImagePath);
+                _ossService.DeleteFile(ossImagePath);
                 _logger?.LogInformation("删除OSS图片: {OssPath}", ossImagePath);
-                
-                // 临时处理：记录需要删除的文件，等OssService添加删除方法后再实现
-                _logger?.LogWarning("OSS删除功能尚未实现，图片路径: {OssPath}", ossImagePath);
             }
             catch (Exception ex)
             {
@@ -521,14 +518,27 @@ namespace DataAccessLib.Services
         public string GetImageUrl(string ossImagePath)
         {
             if (string.IsNullOrEmpty(ossImagePath))
+            {
+                Console.WriteLine("GetImageUrl: ossImagePath为空");
                 return string.Empty;
+            }
 
-            // 根据阿里云OSS的访问规则构建URL
-            // 格式: https://{bucketName}.{endpoint}/{objectName}
-            var bucketName = "wte";
-            var endpoint = "oss-cn-hangzhou.aliyuncs.com";
-            
-            return $"https://{bucketName}.{endpoint}/{ossImagePath}";
+            try
+            {
+                // 根据阿里云OSS的访问规则构建URL
+                // 格式: https://{bucketName}.{endpoint}/{objectName}
+                var bucketName = OssConfig.BucketName;
+                var endpoint = OssConfig.Endpoint.Replace("https://", "");
+                var url = $"https://{bucketName}.{endpoint}/{ossImagePath}";
+                
+                Console.WriteLine($"GetImageUrl: {ossImagePath} -> {url}");
+                return url;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"GetImageUrl failed: {ex.Message}");
+                return string.Empty;
+            }
         }
         #endregion
     }

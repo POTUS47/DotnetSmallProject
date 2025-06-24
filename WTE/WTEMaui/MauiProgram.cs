@@ -43,12 +43,18 @@ namespace WTEMaui
             builder.Services.AddScoped<TestService>();
             builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<MealService>();
+            builder.Services.AddScoped<FoodService>();
+            builder.Services.AddScoped<TagService>();
             
             builder.Services.AddTransient<DashboardPage>(serviceProvider =>
             new DashboardPage(
                 serviceProvider.GetRequiredService<ImageRecognitionService>(),
                 serviceProvider.GetRequiredService<OssService>(),
+                serviceProvider.GetRequiredService<MealService>(),
+                serviceProvider.GetRequiredService<FoodService>(),
+                serviceProvider.GetRequiredService<TagService>(),
                 serviceProvider.GetRequiredService<ILogger<DashboardPage>>()));
+
             // 注册页面
             builder.Services.AddTransient<MainPage>();
             builder.Services.AddTransient<LoginPage>();

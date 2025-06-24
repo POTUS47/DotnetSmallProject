@@ -5,74 +5,59 @@
              Title="食物识别"
              BackgroundColor="#F5F5F5">
 
-    <ScrollView>
-        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto"
-              RowSpacing="20"
-              Padding="20">
+    <!-- 使用Grid作为根容器，以便叠加图片预览弹窗 -->
+    <Grid>
+        <ScrollView>
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+                  RowSpacing="20"
+                  Padding="20">
 
-            <!-- 第0行：标题 -->
-            <Label Text="食物识别"
-                   Grid.Row="0"
-                   HorizontalOptions="Center"
-                   FontSize="24"
-                   FontAttributes="Bold"
-                   TextColor="#512BD4"/>
+                <!-- 第0行：标题 -->
+                <Label Text="食物识别"
+                       Grid.Row="0"
+                       HorizontalOptions="Center"
+                       FontSize="24"
+                       FontAttributes="Bold"
+                       TextColor="#512BD4"/>
 
-            <!-- 第1行：拍照按钮 -->
-            <Button Text="📷 拍照识别食物"
-                    Grid.Row="1"
-                    BackgroundColor="#512BD4"
-                    TextColor="White"
-                    CornerRadius="10"
-                    HeightRequest="60"
-                    FontSize="18"
-                    Clicked="OnTakePhotoClicked"/>
+                <!-- 第1行：拍照按钮 -->
+                <Button Text="📷 拍照识别食物"
+                        Grid.Row="1"
+                        BackgroundColor="#512BD4"
+                        TextColor="White"
+                        CornerRadius="10"
+                        HeightRequest="60"
+                        FontSize="18"
+                        Clicked="OnTakePhotoClicked"/>
 
-            <!-- 第2行：图片预览 -->
-            <Frame Grid.Row="2"
-                   CornerRadius="15"
-                   Padding="0"
-                   BorderColor="#DDDDDD"
-                   IsVisible="{Binding Source={x:Reference PreviewImage}, Path=IsVisible}">
-                <Image x:Name="PreviewImage"
-                       Aspect="AspectFill"
-                       HeightRequest="300"/>
-            </Frame>
+                <!-- 第2行：图片预览 -->
+                <Frame Grid.Row="2"
+                       CornerRadius="15"
+                       Padding="0"
+                       BorderColor="#DDDDDD"
+                       IsVisible="{Binding Source={x:Reference PreviewImage}, Path=IsVisible}">
+                    <Image x:Name="PreviewImage"
+                           Aspect="AspectFill"
+                           HeightRequest="300"/>
+                </Frame>
 
-            <!-- 第3行：识别按钮 -->
-            <Button x:Name="RecognizeButton"
-                    Grid.Row="3"
-                    Text="🔍 开始识别"
-                    BackgroundColor="#512BD4"
-                    TextColor="White"
-                    CornerRadius="10"
-                    HeightRequest="50"
-                    FontSize="16"
-                    IsVisible="False"
-                    Clicked="OnRecognizeClicked"/>
-
-            <!-- 第4行：加载指示器和结果 -->
-            <Grid Grid.Row="4"
-                  RowDefinitions="Auto,Auto"
-                  RowSpacing="10">
-
-                <!-- 加载指示器 -->
+                <!-- 第3行：加载指示器 -->
                 <ActivityIndicator x:Name="LoadingIndicator"
-                                   Grid.Row="0"
+                                   Grid.Row="3"
                                    IsRunning="False"
                                    Color="#512BD4"
                                    HorizontalOptions="Center"
                                    HeightRequest="50"
                                    WidthRequest="50"/>
 
-                <!-- 识别结果 -->
+                <!-- 第4行：识别结果编辑区域 -->
                 <Frame x:Name="ResultFrame"
-                       Grid.Row="1"
+                       Grid.Row="4"
                        BorderColor="#512BD4"
                        CornerRadius="10"
                        Padding="15"
                        IsVisible="False">
-                    <VerticalStackLayout Spacing="8">
+                    <VerticalStackLayout Spacing="15">
                         <Label Text="🍽️ 识别结果" 
                                FontAttributes="Bold"
                                FontSize="18"
@@ -80,22 +65,424 @@
 
                         <BoxView HeightRequest="1"
                                  Color="#512BD4"
-                                 Margin="0,5,0,10"/>
+                                 Margin="0,0,0,10"/>
 
-                        <Label x:Name="ResultLabel"
-                               FontSize="16"
-                               LineBreakMode="WordWrap"/>
+                        <!-- 食物名称编辑区 -->
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="食物名称:" 
+                                   FontSize="14"
+                                   FontAttributes="Bold"
+                                   TextColor="#333"/>
+                            
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Frame Grid.Column="0"
+                                       BorderColor="#DDDDDD"
+                                       CornerRadius="5"
+                                       Padding="10,8"
+                                       BackgroundColor="White">
+                                    <Grid>
+                                        <Label x:Name="FoodNameLabel"
+                                               Text="点击识别食物"
+                                               FontSize="16"
+                                               TextColor="#333"
+                                               VerticalOptions="Center">
+                                            <Label.GestureRecognizers>
+                                                <TapGestureRecognizer Tapped="OnFoodNameTapped"/>
+                                            </Label.GestureRecognizers>
+                                        </Label>
+                                        
+                                        <Entry x:Name="FoodNameEntry"
+                                               Text=""
+                                               FontSize="16"
+                                               IsVisible="False"
+                                               Completed="OnFoodNameCompleted"
+                                               Unfocused="OnFoodNameCompleted"/>
+                                    </Grid>
+                                </Frame>
+                                
+                                <Button Grid.Column="1"
+                                        x:Name="FoodNameEditButton"
+                                        Text="✏️"
+                                        BackgroundColor="Transparent"
+                                        TextColor="#512BD4"
+                                        FontSize="18"
+                                        WidthRequest="40"
+                                        HeightRequest="40"
+                                        Clicked="OnFoodNameTapped"/>
+                            </Grid>
+                        </VerticalStackLayout>
 
-                        <Button Text="✅ 知道了"
-                                BackgroundColor="#512BD4"
-                                TextColor="White"
-                                CornerRadius="5"
-                                HeightRequest="40"
-                                Margin="0,10,0,0"
-                                Clicked="OnDismissResultClicked"/>
+                        <!-- 标签编辑区 -->
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="食物标签:" 
+                                   FontSize="14"
+                                   FontAttributes="Bold"
+                                   TextColor="#333"/>
+                            
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Frame Grid.Column="0"
+                                       BorderColor="#DDDDDD"
+                                       CornerRadius="5"
+                                       Padding="10,8"
+                                       BackgroundColor="White">
+                                    <Grid>
+                                        <Label x:Name="FoodTagLabel"
+                                               Text="暂无标签"
+                                               FontSize="16"
+                                               TextColor="#666"
+                                               VerticalOptions="Center">
+                                            <Label.GestureRecognizers>
+                                                <TapGestureRecognizer Tapped="OnFoodTagTapped"/>
+                                            </Label.GestureRecognizers>
+                                        </Label>
+                                        
+                                        <Entry x:Name="FoodTagEntry"
+                                               Text=""
+                                               FontSize="16"
+                                               IsVisible="False"
+                                               Completed="OnFoodTagCompleted"
+                                               Unfocused="OnFoodTagCompleted"/>
+                                    </Grid>
+                                </Frame>
+                                
+                                <Button Grid.Column="1"
+                                        x:Name="FoodTagEditButton"
+                                        Text="✏️"
+                                        BackgroundColor="Transparent"
+                                        TextColor="#512BD4"
+                                        FontSize="18"
+                                        WidthRequest="40"
+                                        HeightRequest="40"
+                                        Clicked="OnFoodTagTapped"/>
+                            </Grid>
+                        </VerticalStackLayout>
+
+                        <!-- 操作按钮 -->
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,10,0,0">
+                            <Button Grid.Column="0"
+                                    Text="✅ 保存"
+                                    BackgroundColor="#512BD4"
+                                    TextColor="White"
+                                    CornerRadius="5"
+                                    HeightRequest="45"
+                                    Clicked="OnSaveMealClicked"/>
+                            
+                            <Button Grid.Column="1"
+                                    Text="❌ 取消"
+                                    BackgroundColor="#FF6B6B"
+                                    TextColor="White"
+                                    CornerRadius="5"
+                                    HeightRequest="45"
+                                    Clicked="OnCancelClicked"/>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- 第5行：分隔线 -->
+                <Grid Grid.Row="5" 
+                      ColumnDefinitions="*,Auto,*" 
+                      VerticalOptions="Center"
+                      Margin="0,20,0,10">
+                    <BoxView Grid.Column="0" 
+                             HeightRequest="1" 
+                             BackgroundColor="#DDDDDD" 
+                             VerticalOptions="Center"/>
+                    <Label Grid.Column="1" 
+                           Text="用餐历史" 
+                           FontSize="16" 
+                           FontAttributes="Bold" 
+                           TextColor="#666" 
+                           Margin="15,0"/>
+                    <BoxView Grid.Column="2" 
+                             HeightRequest="1" 
+                             BackgroundColor="#DDDDDD" 
+                             VerticalOptions="Center"/>
+                </Grid>
+
+                <!-- 第6行：用餐历史区域 -->
+                <Frame Grid.Row="6"
+                       BorderColor="#E0E0E0"
+                       CornerRadius="12"
+                       Padding="0"
+                       BackgroundColor="White"
+                       HasShadow="True">
+                    <VerticalStackLayout Spacing="0">
+                        <!-- 历史记录头部 -->
+                        <Grid ColumnDefinitions="*,Auto" 
+                              Padding="16,12"
+                              BackgroundColor="#F8F9FA">
+                            <Label Grid.Column="0"
+                                   Text="📅 最近用餐记录"
+                                   FontSize="16"
+                                   FontAttributes="Bold"
+                                   TextColor="#333"
+                                   VerticalOptions="Center"/>
+                            <Button Grid.Column="1"
+                                    x:Name="RefreshHistoryButton"
+                                    Text="刷新"
+                                    BackgroundColor="Transparent"
+                                    TextColor="#512BD4"
+                                    FontSize="12"
+                                    WidthRequest="60"
+                                    HeightRequest="40"
+                                    Clicked="OnRefreshHistoryClicked"/>
+                        </Grid>
+
+                        <!-- 历史记录列表 -->
+                        <CollectionView x:Name="MealHistoryCollectionView"
+                                        BackgroundColor="Transparent"
+                                        SelectionMode="None">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Padding="16,12" 
+                                          RowDefinitions="Auto,Auto,Auto"
+                                          ColumnDefinitions="60,*,Auto">
+                                        
+                                        <!-- 时间线圆点和线条 -->
+                                        <Grid Grid.Row="0" Grid.RowSpan="3" Grid.Column="0" 
+                                              VerticalOptions="Fill"
+                                              HorizontalOptions="Center">
+                                            <BoxView WidthRequest="2" 
+                                                     BackgroundColor="#E0E0E0" 
+                                                     VerticalOptions="Fill" 
+                                                     HorizontalOptions="Center"/>
+                                            <Ellipse Fill="#512BD4" 
+                                                     WidthRequest="12" 
+                                                     HeightRequest="12" 
+                                                     VerticalOptions="Start" 
+                                                     HorizontalOptions="Center"
+                                                     Margin="0,8,0,0"/>
+                                        </Grid>
+
+                                        <!-- 餐食信息 -->
+                                        <VerticalStackLayout Grid.Row="0" Grid.Column="1" 
+                                                             Spacing="4" 
+                                                             Margin="12,0,0,0">
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <Label Grid.Column="0"
+                                                       Text="{Binding MealType}"
+                                                       FontSize="16"
+                                                       FontAttributes="Bold"
+                                                       TextColor="#333"/>
+                                                <Label Grid.Column="1"
+                                                       FontSize="12"
+                                                       TextColor="#666">
+                                                    <Label.Text>
+                                                        <MultiBinding StringFormat="{}{0:MM/dd} {1:HH:mm}">
+                                                            <Binding Path="MealDate"/>
+                                                            <Binding Path="MealTime"/>
+                                                        </MultiBinding>
+                                                    </Label.Text>
+                                                </Label>
+                                            </Grid>
+                                        </VerticalStackLayout>
+
+                                        <!-- 食物列表 -->
+                                        <CollectionView Grid.Row="1" Grid.Column="1" 
+                                                        ItemsSource="{Binding MealFoodImages}"
+                                                        Margin="12,8,0,0">
+                                            <CollectionView.ItemsLayout>
+                                                <LinearItemsLayout Orientation="Horizontal" ItemSpacing="8"/>
+                                            </CollectionView.ItemsLayout>
+                                            <CollectionView.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Frame BorderColor="#E0E0E0"
+                                                           CornerRadius="8"
+                                                           Padding="8,4"
+                                                           BackgroundColor="#F8F9FA"
+                                                           HasShadow="False">
+                                                        <Grid ColumnDefinitions="Auto,*">
+                                                            <!-- 食物图片缩略图 -->
+                                                            <Frame Grid.Column="0"
+                                                                   CornerRadius="4"
+                                                                   Padding="0"
+                                                                   WidthRequest="24"
+                                                                   HeightRequest="24"
+                                                                   BorderColor="Transparent"
+                                                                   BackgroundColor="LightGray">
+                                                                <Frame.GestureRecognizers>
+                                                                    <TapGestureRecognizer Tapped="OnThumbnailTapped"/>
+                                                                </Frame.GestureRecognizers>
+                                                                <Grid>
+                                                                    <!-- 默认图标 -->
+                                                                    <Label Text="🍽️" 
+                                                                           FontSize="12" 
+                                                                           HorizontalOptions="Center" 
+                                                                           VerticalOptions="Center"
+                                                                           TextColor="#999"/>
+                                                                    
+                                                                    <!-- 实际图片 -->
+                                                                    <Image Aspect="AspectFill"
+                                                                           BackgroundColor="Transparent">
+                                                                        <Image.Source>
+                                                                            <UriImageSource Uri="{Binding ImageUrl}" 
+                                                                                          CachingEnabled="True" 
+                                                                                          CacheValidity="7"/>
+                                                                        </Image.Source>
+                                                                        <Image.Triggers>
+                                                                            <DataTrigger TargetType="Image" 
+                                                                                       Binding="{Binding ImageUrl}" 
+                                                                                       Value="">
+                                                                                <Setter Property="IsVisible" Value="False"/>
+                                                                            </DataTrigger>
+                                                                            <DataTrigger TargetType="Image" 
+                                                                                       Binding="{Binding ImageUrl}" 
+                                                                                       Value="{x:Null}">
+                                                                                <Setter Property="IsVisible" Value="False"/>
+                                                                            </DataTrigger>
+                                                                        </Image.Triggers>
+                                                                    </Image>
+                                                                </Grid>
+                                                            </Frame>
+                                                            
+                                                            <!-- 食物名称 -->
+                                                            <Label Grid.Column="1"
+                                                                   Text="{Binding Food.Name}"
+                                                                   FontSize="12"
+                                                                   TextColor="#555"
+                                                                   VerticalOptions="Center"
+                                                                   Margin="4,0,0,0"/>
+                                                        </Grid>
+                                                    </Frame>
+                                                </DataTemplate>
+                                            </CollectionView.ItemTemplate>
+                                        </CollectionView>
+
+                                        <!-- 标签列表 -->
+                                        <CollectionView Grid.Row="2" Grid.Column="1" 
+                                                        ItemsSource="{Binding MealFoodTags}"
+                                                        Margin="12,4,0,8">
+                                            <CollectionView.ItemsLayout>
+                                                <LinearItemsLayout Orientation="Horizontal" ItemSpacing="4"/>
+                                            </CollectionView.ItemsLayout>
+                                            <CollectionView.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border BackgroundColor="#E3F2FD"
+                                                            Stroke="#2196F3"
+                                                            StrokeThickness="1"
+                                                            StrokeShape="RoundRectangle 10">
+                                                        <Label Text="{Binding Tag.TagName}"
+                                                               FontSize="10"
+                                                               TextColor="#1976D2"
+                                                               Padding="6,2"/>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </CollectionView.ItemTemplate>
+                                        </CollectionView>
+
+                                        <!-- 分隔线 -->
+                                        <BoxView Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2"
+                                                 HeightRequest="1"
+                                                 BackgroundColor="#F0F0F0"
+                                                 Margin="8,8,10,-20"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+
+                        <!-- 空状态提示 -->
+                        <VerticalStackLayout x:Name="EmptyStateLayout"
+                                             Spacing="12"
+                                             Padding="40,60"
+                                             HorizontalOptions="Center"
+                                             IsVisible="False">
+                            <Label Text="🍽️"
+                                   FontSize="48"
+                                   HorizontalOptions="Center"
+                                   Opacity="0.3"/>
+                            <Label Text="暂无用餐记录"
+                                   FontSize="16"
+                                   TextColor="#999"
+                                   HorizontalOptions="Center"/>
+                            <Label Text="开始记录您的第一餐吧！"
+                                   FontSize="12"
+                                   TextColor="#CCC"
+                                   HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+
+                        <!-- 查看更多按钮 -->
+                        <Button x:Name="ViewMoreButton"
+                                Text="查看更多历史记录 →"
+                                BackgroundColor="Transparent"
+                                TextColor="#512BD4"
+                                FontSize="14"
+                                Margin="16,8,16,16"
+                                Clicked="OnViewMoreHistoryClicked"/>
                     </VerticalStackLayout>
                 </Frame>
             </Grid>
+        </ScrollView>
+
+        <!-- 图片预览弹窗 - 移到最外层以覆盖整个页面 -->
+        <Grid x:Name="ImagePreviewOverlay"
+              IsVisible="False"
+              BackgroundColor="#90000000"
+              HorizontalOptions="Fill"
+              VerticalOptions="Fill"
+              ZIndex="1000">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnOverlayTapped"/>
+            </Grid.GestureRecognizers>
+            
+            <Frame BackgroundColor="White"
+                   CornerRadius="16"
+                   Padding="0"
+                   MaximumWidthRequest="380"
+                   MaximumHeightRequest="500"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   HasShadow="True"
+                   Margin="20">
+                <VerticalStackLayout Spacing="0">
+                    <!-- 关闭按钮 -->
+                    <Grid ColumnDefinitions="*,Auto" 
+                          Padding="10,6,10,12"
+                          BackgroundColor="#F8F9FA">
+                        <Label Grid.Column="0"
+                               x:Name="PreviewTitle"
+                               Text="食物图片"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="#333"
+                               VerticalOptions="Center"/>
+                        <Button Grid.Column="1"
+                                Text="✕"
+                                BackgroundColor="Transparent"
+                                TextColor="#666"
+                                FontSize="15"
+                                WidthRequest="50"
+                                HeightRequest="40"
+                                Clicked="OnClosePreviewClicked"/>
+                    </Grid>
+                    
+                    <!-- 大图显示 -->
+                    <Frame Padding="16"
+                           BackgroundColor="White">
+                        <Image x:Name="PopupPreviewImage"
+                               MaximumWidthRequest="340"
+                               MaximumHeightRequest="340"
+                               Aspect="AspectFit"
+                               BackgroundColor="#F5F5F5"/>
+                    </Frame>
+                    
+                    <!-- 图片信息 -->
+                    <Grid Padding="20,12,20,20"
+                          ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0"
+                               x:Name="PreviewInfo"
+                               Text="点击空白处关闭"
+                               FontSize="12"
+                               TextColor="#666"
+                               VerticalOptions="Center"/>
+                        <Button Grid.Column="1"
+                                Text="🔗 查看原图"
+                                BackgroundColor="Transparent"
+                                TextColor="#512BD4"
+                                FontSize="12"
+                                Clicked="OnViewOriginalClicked"/>
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
         </Grid>
-    </ScrollView>
+    </Grid>
 </ContentPage>

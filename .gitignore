@@ -55,3 +55,4 @@ nunit-*.xml
 /WTE/.vs
 /WTE/test
 WTE/DataAccessLib/Config/ossconfig.json
+WTE/DataAccessLib/Config/OssConfig.cs

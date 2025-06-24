@@ -6,8 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using System.Text.Json;
-using System.Reflection;
+using DataAccessLib.Config;
 
 namespace DataAccessLib.Services
 {
@@ -17,15 +16,12 @@ namespace DataAccessLib.Services
 
         public OssService()
         {
-            var endpoint = "https://oss-cn-hangzhou.aliyuncs.com";
-            
-            // 读取配置文件
-            var config = LoadOssConfig();
-            var accessKeyId = config.AccessKeyId;
-            var accessKeySecret = config.AccessKeySecret;
-            
-            var bucketName = "wte";
-            var region = "cn-hangzhou";
+            var endpoint = OssConfig.Endpoint;
+            var accessKeyId = OssConfig.AccessKeyId;
+            var accessKeySecret = OssConfig.AccessKeySecret;
+            var bucketName = OssConfig.BucketName;
+            var region = OssConfig.Region;
+
             // 创建ClientConfiguration实例，按照您的需要修改默认参数。
             var conf = new ClientConfiguration();
 
@@ -34,6 +30,7 @@ namespace DataAccessLib.Services
 
             _ossClient = new OssClient(endpoint, accessKeyId, accessKeySecret, conf);
             _ossClient.SetRegion(region);
+            
             try
             {
                 var bucket = _ossClient.CreateBucket(bucketName);
@@ -43,38 +40,6 @@ namespace DataAccessLib.Services
             {
                 Console.WriteLine("Create bucket failed, {0}", ex.Message);
             }
-            
-        }
-
-        private OssConfigModel LoadOssConfig()
-        {
-            try
-            {
-                // 获取程序集目录
-                var assembly = Assembly.GetExecutingAssembly();
-                var assemblyLocation = Path.GetDirectoryName(assembly.Location);
-                var configPath = Path.Combine(assemblyLocation, "Config", "ossconfig.json");
-                
-                if (!File.Exists(configPath))
-                {
-                    throw new FileNotFoundException($"配置文件不存在: {configPath}");
-                }
-
-                var jsonString = File.ReadAllText(configPath);
-                var configWrapper = JsonSerializer.Deserialize<OssConfigWrapper>(jsonString);
-                
-                return configWrapper?.OssConfig ?? throw new Exception("配置文件格式错误");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"读取OSS配置失败: {ex.Message}");
-                // 如果读取失败，使用默认值
-                return new OssConfigModel
-                {
-                    AccessKeyId = "LTAI5tSfy7bGaRgUsJEFpSN5",
-                    AccessKeySecret = "Ia9tJxMvzNvJJ1TtDDH7Q6xC0hb5tl"
-                };
-            }
         }
 
         /// <summary>
@@ -82,11 +47,7 @@ namespace DataAccessLib.Services
         /// </summary>
         public void UploadFile(string objectName, string localFilename)
         {
-            // 填写Object完整路径，完整路径中不能包含Bucket名称，例如exampledir/exampleobject.txt。
-            // var objectName = "exampledir/exampleobject.txt";
-            // 填写本地文件完整路径，例如D:\\localpath\\examplefile.txt。如果未指定本地路径，则默认从示例程序所属项目对应本地路径中上传文件。
-            // var localFilename = "D:\\localpath\\examplefile.txt";
-            var bucketName = "wte";
+            var bucketName = OssConfig.BucketName;
 
             try
             {
@@ -98,7 +59,6 @@ namespace DataAccessLib.Services
             {
                 Console.WriteLine("Put object failed, {0}", ex.Message);
             }
-
         }
 
         /// <summary>
@@ -106,12 +66,7 @@ namespace DataAccessLib.Services
         /// </summary>
         public void DownloadFile(string objectName, string downloadFilename)
         {
-            // 填写Object完整路径，完整路径中不能包含Bucket名称，例如exampledir/exampleobject.txt。
-            // var objectName = "exampledir/exampleobject.txt";
-            // 下载Object到本地文件examplefile.txt，并保存到指定的本地路径中（D:\\localpath）。如果指定的本地文件存在会覆盖，不存在则新建。
-            // 如果未指定本地路径，则下载后的文件默认保存到示例程序所属项目对应本地路径中。
-            // var downloadFilename = "D:\\localpath\\examplefile.txt";
-            var bucketName = "wte";
+            var bucketName = OssConfig.BucketName;
 
             try
             {
@@ -165,7 +120,7 @@ namespace DataAccessLib.Services
         /// </summary>
         public void DeleteFile(string objectName)
         {
-            var bucketName = "wte";
+            var bucketName = OssConfig.BucketName;
 
             try
             {
@@ -184,11 +139,13 @@ namespace DataAccessLib.Services
         /// </summary>
         public bool FileExists(string objectName)
         {
-            var bucketName = "wte";
+            var bucketName = OssConfig.BucketName;
 
             try
             {
+                Console.WriteLine($"检查文件是否存在: {objectName}");
                 var result = _ossClient.DoesObjectExist(bucketName, objectName);
+                Console.WriteLine($"文件存在性检查结果: {result}");
                 return result;
             }
             catch (Exception ex)
@@ -203,32 +160,44 @@ namespace DataAccessLib.Services
         /// </summary>
         public string GetFileUrl(string objectName, DateTime? expiration = null)
         {
-            var bucketName = "wte";
+            var bucketName = OssConfig.BucketName;
 
             try
             {
+                Console.WriteLine($"开始生成预签名URL: objectName={objectName}");
+                
                 // 如果没有指定过期时间，默认1小时
                 var exp = expiration ?? DateTime.Now.AddHours(1);
+                Console.WriteLine($"过期时间: {exp}");
+                
                 var uri = _ossClient.GeneratePresignedUri(bucketName, objectName, exp);
-                return uri.ToString();
+                var url = uri.ToString();
+                
+                Console.WriteLine($"生成预签名URL成功: {url}");
+                return url;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Generate presigned URL failed: {ex.Message}");
+                Console.WriteLine($"StackTrace: {ex.StackTrace}");
                 throw;
             }
         }
-    }
 
-    // 配置模型类
-    public class OssConfigWrapper
-    {
-        public OssConfigModel OssConfig { get; set; }
-    }
-
-    public class OssConfigModel
-    {
-        public string AccessKeyId { get; set; }
-        public string AccessKeySecret { get; set; }
+        /// <summary>
+        /// 检查OSS连接状态
+        /// </summary>
+        public bool IsConnected()
+        {
+            try
+            {
+                var bucketName = OssConfig.BucketName;
+                return _ossClient.DoesBucketExist(bucketName);
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }
