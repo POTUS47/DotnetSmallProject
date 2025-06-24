@@ -6,7 +6,8 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Text.Json;
+using System.Reflection;
 
 namespace DataAccessLib.Services
 {
@@ -17,8 +18,12 @@ namespace DataAccessLib.Services
         public OssService()
         {
             var endpoint = "https://oss-cn-hangzhou.aliyuncs.com";
-            var accessKeyId = "LTAI5tSfy7bGaRgUsJEFpSN5";
-            var accessKeySecret = "Ia9tJxMvzNvJJ1TtDDH7Q6xC0hb5tl";
+            
+            // 读取配置文件
+            var config = LoadOssConfig();
+            var accessKeyId = config.AccessKeyId;
+            var accessKeySecret = config.AccessKeySecret;
+            
             var bucketName = "wte";
             var region = "cn-hangzhou";
             // 创建ClientConfiguration实例，按照您的需要修改默认参数。
@@ -39,6 +44,37 @@ namespace DataAccessLib.Services
                 Console.WriteLine("Create bucket failed, {0}", ex.Message);
             }
             
+        }
+
+        private OssConfigModel LoadOssConfig()
+        {
+            try
+            {
+                // 获取程序集目录
+                var assembly = Assembly.GetExecutingAssembly();
+                var assemblyLocation = Path.GetDirectoryName(assembly.Location);
+                var configPath = Path.Combine(assemblyLocation, "Config", "ossconfig.json");
+                
+                if (!File.Exists(configPath))
+                {
+                    throw new FileNotFoundException($"配置文件不存在: {configPath}");
+                }
+
+                var jsonString = File.ReadAllText(configPath);
+                var configWrapper = JsonSerializer.Deserialize<OssConfigWrapper>(jsonString);
+                
+                return configWrapper?.OssConfig ?? throw new Exception("配置文件格式错误");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"读取OSS配置失败: {ex.Message}");
+                // 如果读取失败，使用默认值
+                return new OssConfigModel
+                {
+                    AccessKeyId = "LTAI5tSfy7bGaRgUsJEFpSN5",
+                    AccessKeySecret = "Ia9tJxMvzNvJJ1TtDDH7Q6xC0hb5tl"
+                };
+            }
         }
 
         /// <summary>
@@ -182,5 +218,17 @@ namespace DataAccessLib.Services
                 throw;
             }
         }
+    }
+
+    // 配置模型类
+    public class OssConfigWrapper
+    {
+        public OssConfigModel OssConfig { get; set; }
+    }
+
+    public class OssConfigModel
+    {
+        public string AccessKeyId { get; set; }
+        public string AccessKeySecret { get; set; }
     }
 }
