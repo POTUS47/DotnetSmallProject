@@ -4,14 +4,33 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Syncfusion.Maui.Calendar;
+using System.ComponentModel;
 
 namespace WTEMaui.Views
 {
-    public partial class AnalysisPage : ContentPage
+    public partial class AnalysisPage : ContentPage, INotifyPropertyChanged
     {
         public ObservableCollection<DailyStatVM> DailyStats { get; set; } = new();
         public string UserName { get; set; } = "POTUS 47";
         public string HealthAdvice { get; set; } = "健康建议加载中...";
+
+        private DateTime _selectedDate = DateTime.Today;
+        public DateTime SelectedDate
+        {
+            get => _selectedDate;
+            set
+            {
+                if (_selectedDate != value)
+                {
+                    _selectedDate = value;
+                    OnPropertyChanged(nameof(SelectedDate));
+                    UpdateSelectedDayFoods();
+                }
+            }
+        }
+
+        public ObservableCollection<string> SelectedDayFoods { get; set; } = new();
 
         private readonly AnalysisService _analysisService;
         private readonly int _userId = 1; // TODO: 替换为实际登录用户ID
@@ -29,7 +48,7 @@ namespace WTEMaui.Views
                 InitializeComponent();
                 _analysisService = analysisService;
                 BindingContext = this;
-                _startDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-14));
+                _startDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-30));
                 _endDate = DateOnly.FromDateTime(DateTime.Today);
                 LoadData();
             }
@@ -56,6 +75,39 @@ namespace WTEMaui.Views
             }
             HealthAdvice = await _analysisService.GetHealthAdviceAsync(_userId, _startDate, _endDate);
             OnPropertyChanged(nameof(HealthAdvice));
+            UpdateSelectedDayFoods();
+        }
+
+        private void UpdateSelectedDayFoods()
+        {
+            SelectedDayFoods.Clear();
+            var dateStr = SelectedDate.ToString("yyyy-MM-dd");
+            var stat = DailyStats.FirstOrDefault(d => d.Date == dateStr);
+            if (stat != null && stat.FoodsString != "无记录")
+            {
+                foreach (var food in stat.FoodsString.Split(", "))
+                {
+                    SelectedDayFoods.Add(food);
+                }
+            }
+            else
+            {
+                SelectedDayFoods.Add("暂无数据");
+            }
+        }
+
+        private void OnCalendarSelectionChanged(object sender, CalendarSelectionChangedEventArgs e)
+        {
+            if (e.NewValue is DateTime date)
+            {
+                SelectedDate = date;
+            }
+        }
+
+        public new event PropertyChangedEventHandler PropertyChanged;
+        protected new void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public class DailyStatVM

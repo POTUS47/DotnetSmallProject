@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:sf="clr-namespace:Syncfusion.Maui.Calendar;assembly=Syncfusion.Maui.Calendar"
              x:Class="WTEMaui.Views.AnalysisPage"
              Title="分析">
     <VerticalStackLayout Spacing="16" Padding="16">
@@ -11,13 +12,19 @@
                 <Label Text="{Binding UserName}" FontSize="20" VerticalOptions="Center" />
             </HorizontalStackLayout>
         </Frame>
-        <CollectionView ItemsSource="{Binding DailyStats}">
+        <!-- 日历控件 -->
+        <sf:SfCalendar x:Name="FoodCalendar"
+                      View="Month"
+                      SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
+                      SelectionChanged="OnCalendarSelectionChanged"/>
+        <!-- 选中日期的食物详情 -->
+        <Label Text="{Binding SelectedDate, StringFormat='选中日期: {0:yyyy-MM-dd}'}" FontAttributes="Bold"/>
+        <CollectionView ItemsSource="{Binding SelectedDayFoods}">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Frame Margin="4" Padding="8" BorderColor="#DDD" CornerRadius="8">
                         <VerticalStackLayout>
-                            <Label Text="{Binding Date}" FontAttributes="Bold" />
-                            <Label Text="{Binding FoodsString}" />
+                            <Label Text="{Binding}" />
                         </VerticalStackLayout>
                     </Frame>
                 </DataTemplate>
