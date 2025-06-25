@@ -39,7 +39,7 @@ namespace LLMLib
                 var messages = new List<ChatMessage>
                 {
                     new SystemChatMessage(ChatMessageContentPart.CreateTextPart("You are a helpful assistant that identifies food items.")),
-                    new UserChatMessage(ChatMessageContentPart.CreateTextPart("这是什么食物？请你直接给出他的名字和分类，不要有多余的解释。示例回答：【苹果/水果】或【西红柿炒鸡蛋/炒菜】"),
+                    new UserChatMessage(ChatMessageContentPart.CreateTextPart("这是什么食物？请你直接给出他的名字和分类，不要有多余的解释。示例回答：苹果/水果或西红柿炒鸡蛋/炒菜"),
                     ChatMessageContentPart.CreateImagePart(imageBinary, $"image/{imageFormat}")),
                 };
 

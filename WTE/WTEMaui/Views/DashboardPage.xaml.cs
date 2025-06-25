@@ -75,6 +75,66 @@ namespace WTEMaui.Views
                     return;
                 }
 
+                // 处理选中的照片
+                await ProcessSelectedPhotoAsync(photo);
+            }
+            catch (Exception ex)
+            {
+                LoadingIndicator.IsRunning = false;
+                _logger?.LogError(ex, "拍照失败");
+                await DisplayAlert("错误", $"拍照失败: {ex.Message}", "确定");
+            }
+        }
+
+        /// <summary>
+        /// 从相册选择图片
+        /// </summary>
+        private async void OnSelectFromGalleryClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                // 重置UI状态
+                ResultFrame.IsVisible = false;
+                LoadingIndicator.IsRunning = true;
+
+                // 检查权限
+                if (!await CheckAndRequestGalleryPermissions())
+                {
+                    await DisplayAlert("权限不足", "需要访问相册权限才能使用此功能", "确定");
+                    LoadingIndicator.IsRunning = false;
+                    return;
+                }
+
+                // 从相册选择图片
+                var photo = await MediaPicker.PickPhotoAsync(new MediaPickerOptions
+                {
+                    Title = "请选择食物图片"
+                });
+
+                if (photo == null) 
+                {
+                    LoadingIndicator.IsRunning = false;
+                    return;
+                }
+
+                // 处理选中的照片
+                await ProcessSelectedPhotoAsync(photo);
+            }
+            catch (Exception ex)
+            {
+                LoadingIndicator.IsRunning = false;
+                _logger?.LogError(ex, "选择图片失败");
+                await DisplayAlert("错误", $"选择图片失败: {ex.Message}", "确定");
+            }
+        }
+
+        /// <summary>
+        /// 处理选中的照片（统一处理拍照和相册选择的图片）
+        /// </summary>
+        private async Task ProcessSelectedPhotoAsync(FileResult photo)
+        {
+            try
+            {
                 // 记录照片信息
                 _capturedImagePath = photo.FullPath;
                 _logger?.LogInformation("照片完整路径: {FullPath}", photo.FullPath);
@@ -98,8 +158,8 @@ namespace WTEMaui.Views
             catch (Exception ex)
             {
                 LoadingIndicator.IsRunning = false;
-                _logger?.LogError(ex, "拍照失败");
-                await DisplayAlert("错误", $"拍照失败: {ex.Message}", "确定");
+                _logger?.LogError(ex, "处理选中照片失败");
+                throw;
             }
         }
 
@@ -658,6 +718,35 @@ namespace WTEMaui.Views
                 _capturedImagePath = null;
                 _ossImagePath = null;
                 _capturedImageData = null;
+            }
+        }
+
+        /// <summary>
+        /// 检查和请求相册权限
+        /// </summary>
+        private async Task<bool> CheckAndRequestGalleryPermissions()
+        {
+            try
+            {
+                var mediaStatus = await Permissions.CheckStatusAsync<Permissions.Media>();
+                if (mediaStatus != PermissionStatus.Granted)
+                {
+                    mediaStatus = await Permissions.RequestAsync<Permissions.Media>();
+                }
+
+                // 对于较低版本的Android，可能需要检查Photos权限
+                var photosStatus = await Permissions.CheckStatusAsync<Permissions.Photos>();
+                if (photosStatus != PermissionStatus.Granted)
+                {
+                    photosStatus = await Permissions.RequestAsync<Permissions.Photos>();
+                }
+
+                return mediaStatus == PermissionStatus.Granted || photosStatus == PermissionStatus.Granted;
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "相册权限检查失败");
+                return false;
             }
         }
 

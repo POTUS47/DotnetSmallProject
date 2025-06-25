@@ -33,7 +33,7 @@
                     <CollectionView ItemsSource="{Binding SelectedDayFoods}">
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
-                                <Frame Margin="20,40,20,40" Padding="8" BorderColor="#DDD" CornerRadius="6">
+                                <Frame Margin="10,1,10,5" Padding="8" BorderColor="#DDD" CornerRadius="6">
                                     <Label Text="{Binding}" FontSize="14"/>
                                 </Frame>
                             </DataTemplate>
