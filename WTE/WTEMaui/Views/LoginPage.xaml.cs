@@ -46,6 +46,9 @@ namespace WTEMaui.Views
                     _logger?.LogInformation("登录成功，准备跳转页面");
                     ShowStatus("登录成功！", false);
                     
+                    // 存储当前登录用户信息
+                    App.CurrentUser = user;
+                    
                     // 延迟一下再跳转，让用户看到成功消息
                     await Task.Delay(1000);
 

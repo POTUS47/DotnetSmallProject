@@ -92,6 +92,9 @@ namespace WTEMaui
 
             if (result)
             {
+                // 清除当前用户信息
+                App.CurrentUser = null;
+                
                 // 返回登录页面
                 await Shell.Current.GoToAsync($"{nameof(LoginPage)}");
             }

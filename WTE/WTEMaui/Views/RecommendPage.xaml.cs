@@ -8,7 +8,7 @@ namespace WTEMaui.Views
     public partial class RecommendPage : ContentPage, INotifyPropertyChanged
     {
         private readonly RecommendService _recommendService;
-        private readonly int _userId = 1; // TODO: 替换为实际登录用户ID
+        private readonly int _userId; // 移除硬编码，改为从当前用户获取
         public string RecommendResult { get; set; } = string.Empty;
         public string StatusMsg { get; set; } = string.Empty;
         public bool HasResult { get; set; } = false;
@@ -18,6 +18,10 @@ namespace WTEMaui.Views
         {
             InitializeComponent();
             _recommendService = recommendService;
+            
+            // 从当前登录用户获取用户ID
+            _userId = App.CurrentUser?.UserId ?? 1; // 如果未登录，默认使用ID=1
+            
             BindingContext = this;
         }
 

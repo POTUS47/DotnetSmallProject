@@ -77,5 +77,21 @@ namespace WTEMaui.Views
                 }
             }
         }
+
+        private async void OnLogoutClicked(object sender, EventArgs e)
+        {
+            var result = await DisplayAlert("确认登出", "确定要登出当前用户吗？", "确定", "取消");
+            
+            if (result)
+            {
+                // 清除当前用户信息
+                App.CurrentUser = null;
+                
+                // 跳转到登录页面
+                Application.Current.MainPage = new AppShell();
+                
+                await DisplayAlert("成功", "已成功登出", "确定");
+            }
+        }
     }
 } 
