@@ -664,9 +664,9 @@ namespace WTEMaui.Views
             var hour = time.Hour;
             return hour switch
             {
-                >= 6 and < 10 => "早饭",
-                >= 10 and < 14 => "午饭",
-                >= 14 and < 18 => "零食",
+                >= 5 and < 12 => "早饭",
+                >= 12 and < 15 => "午饭",
+                >= 15 and < 18 => "零食",
                 >= 18 and < 24 => "晚饭",
             };
         }

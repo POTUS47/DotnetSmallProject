@@ -493,7 +493,7 @@
                                            FontSize="14"
                                            TextColor="#666"/>
                                     <CollectionView x:Name="HistoryFoodCollectionView"
-                                                    MaximumHeightRequest="120"
+                                                    MaximumHeightRequest="50"
                                                     BackgroundColor="Transparent">
                                         <CollectionView.ItemsLayout>
                                             <LinearItemsLayout Orientation="Horizontal" ItemSpacing="8"/>
@@ -504,6 +504,7 @@
                                                         BackgroundColor="#F8F9FA"
                                                         Stroke="#DDD"
                                                         StrokeThickness="1"
+                                                        HeightRequest="45"
                                                         StrokeShape="RoundRectangle 8"
                                                         Padding="12,6">
                                                     <Border.GestureRecognizers>
@@ -548,7 +549,7 @@
                                            FontSize="14"
                                            TextColor="#666"/>
                                     <CollectionView x:Name="HistoryTagCollectionView"
-                                                    MaximumHeightRequest="150"
+                                                    MaximumHeightRequest="50"
                                                     BackgroundColor="Transparent">
                                         <CollectionView.ItemsLayout>
                                             <LinearItemsLayout Orientation="Horizontal" ItemSpacing="6"/>
@@ -560,7 +561,8 @@
                                                         Stroke="#2196F3"
                                                         StrokeThickness="1"
                                                         StrokeShape="RoundRectangle 12"
-                                                        Padding="10,4">
+                                                        HeightRequest="45"
+                                                        Padding="10,0">
                                                     <Border.GestureRecognizers>
                                                         <TapGestureRecognizer Tapped="OnHistoryTagTapped"/>
                                                     </Border.GestureRecognizers>
