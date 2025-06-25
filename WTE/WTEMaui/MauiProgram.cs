@@ -37,7 +37,11 @@ namespace WTEMaui
                 new ImageRecognitionService(
                     "sk-0ea4236a89b8411eb0044e4931423862", // 替换为你的API密钥
                     sp.GetService<ILogger<ImageRecognitionService>>()));
-
+            builder.Services.AddSingleton<HealthAnalysisService>(sp =>
+                new HealthAnalysisService(
+                    "sk-0ea4236a89b8411eb0044e4931423862", // 替换为你的API密钥
+                    sp.GetService<ILogger<HealthAnalysisService>>()));
+            
             // 注册OSS服务
             builder.Services.AddSingleton<OssService>();
 
@@ -63,7 +67,11 @@ namespace WTEMaui
             builder.Services.AddTransient<MainPage>();
             builder.Services.AddTransient<LoginPage>();
             builder.Services.AddTransient<RegisterPage>();
-            builder.Services.AddTransient<AnalysisPage>();
+            builder.Services.AddTransient<AnalysisPage>(serviceProvider =>
+            new AnalysisPage(
+                serviceProvider.GetRequiredService<HealthAnalysisService>(),
+                serviceProvider.GetRequiredService<MealService>(),
+                serviceProvider.GetRequiredService<AnalysisService>()));
             builder.Services.AddTransient<SettingsPage>();
 
 #if DEBUG

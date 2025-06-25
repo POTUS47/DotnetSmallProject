@@ -1,12 +1,13 @@
 ﻿using DataAccessLib.Services;
+using LLMLib;
 using Microsoft.Maui.Controls;
+using Syncfusion.Maui.Calendar;
 using System;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
-using Syncfusion.Maui.Calendar;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace WTEMaui.Views
 {
@@ -14,7 +15,42 @@ namespace WTEMaui.Views
     {
         public ObservableCollection<DailyStatVM> DailyStats { get; set; } = new();
         public string UserName { get; set; } = "POTUS 47";
-        public string HealthAdvice { get; set; } = "健康建议加载中...";
+        
+        private string _healthAdvice = "";
+        public string HealthAdvice
+        {
+            get => _healthAdvice;
+            set
+            {
+                if (_healthAdvice != value)
+                {
+                    _healthAdvice = value;
+                    OnPropertyChanged(nameof(HealthAdvice));
+                    OnPropertyChanged(nameof(ShowHealthAdvice));
+                }
+            }
+        }
+
+        private bool _isLoadingAdvice = false;
+        public bool IsLoadingAdvice
+        {
+            get => _isLoadingAdvice;
+            set
+            {
+                if (_isLoadingAdvice != value)
+                {
+                    _isLoadingAdvice = value;
+                    OnPropertyChanged(nameof(IsLoadingAdvice));
+                    OnPropertyChanged(nameof(ShowGetAdviceButton));
+                }
+            }
+        }
+
+        public bool ShowGetAdviceButton => !IsLoadingAdvice && string.IsNullOrEmpty(HealthAdvice);
+        public bool ShowHealthAdvice => !string.IsNullOrEmpty(HealthAdvice);
+
+        private readonly MealService _mealService;
+        private readonly HealthAnalysisService _healthAnalysisService;
 
         private DateTime _selectedDate = DateTime.Today;
         public DateTime SelectedDate
@@ -38,31 +74,27 @@ namespace WTEMaui.Views
         private DateOnly _startDate;
         private DateOnly _endDate;
 
-        public AnalysisPage() : this(WTEMaui.App.Services?.GetService<DataAccessLib.Services.AnalysisService>())
-        {
-        }
 
-        public AnalysisPage(AnalysisService analysisService)
+        public AnalysisPage(HealthAnalysisService healthAnalysisService,MealService mealService, AnalysisService analysisService)
         {
             try
             {
                 InitializeComponent();
                 _analysisService = analysisService;
                 
-                // 从当前登录用户获取用户ID
                 _userId = App.CurrentUser?.UserId ?? 1; // 如果未登录，默认使用ID=1
-                
-                // 设置用户名显示
                 UserName = App.CurrentUser?.Username ?? "未登录用户";
-                
                 BindingContext = this;
-
-                // 设置日历的标识符
+                _mealService = mealService;
+                _healthAnalysisService= healthAnalysisService;
                 FoodCalendar.Identifier = CalendarIdentifier.Gregorian;
 
                 _startDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-30));
                 _endDate = DateOnly.FromDateTime(DateTime.Today);
-                LoadData();
+                Task.Run(async () =>
+                {
+                    await LoadData();
+                });
             }
             catch (Exception ex)
             {
@@ -71,7 +103,43 @@ namespace WTEMaui.Views
             }
         }
 
-        private async void LoadData()
+        private async void OnGetAdviceClicked(object sender, EventArgs e)
+        {
+            IsLoadingAdvice = true;
+            try
+            {
+                await AnalysisLLM();
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("错误", $"获取健康建议失败: {ex.Message}", "确定");
+                HealthAdvice = "获取健康建议失败，请稍后重试";
+            }
+            finally
+            {
+                IsLoadingAdvice = false;
+            }
+        }
+
+        private async Task AnalysisLLM()
+        {
+            var history = await _mealService.GetUserMealsJsonAsync(_userId);
+            try
+            {
+                Console.WriteLine("正在调用大模型分析饮食数据...");
+
+                // ✅ 调用分析方法
+                string advice = await _healthAnalysisService.AnalyzeMealTimeAsync(history);
+                HealthAdvice = advice;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"错误: {ex.Message}");
+                throw; // 重新抛出异常让调用方处理
+            }
+        }
+
+        private async Task LoadData()
         {
             var stats = await _analysisService.GetUserDailyStatsAsync(_userId, _startDate, _endDate);
             DailyStats.Clear();
@@ -85,8 +153,6 @@ namespace WTEMaui.Views
                     TotalProtein = s.TotalProtein
                 });
             }
-            HealthAdvice = await _analysisService.GetHealthAdviceAsync(_userId, _startDate, _endDate);
-            OnPropertyChanged(nameof(HealthAdvice));
             UpdateSelectedDayFoods();
         }
 

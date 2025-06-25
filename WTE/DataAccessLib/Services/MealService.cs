@@ -3,6 +3,7 @@ using DataAccessLib.Data;
 using DataAccessLib.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace DataAccessLib.Services
 {
@@ -181,6 +182,46 @@ namespace DataAccessLib.Services
         #endregion
 
         #region 餐食查询
+
+        /// <summary>
+        /// 获取当前用户的饮食记录JSON
+        /// </summary>
+        public async Task<string> GetUserMealsJsonAsync(int userId)
+        {
+            try
+            {
+                _logger?.LogInformation("正在查询用户 {UserId} 的饮食记录", userId);
+
+                // 查询数据库
+                var meals = await _context.Meals
+                    .Where(m => m.UserId == userId)
+                    .OrderByDescending(m => m.MealDate)
+                    .ThenBy(m => m.MealTime)
+                    .Select(m => new
+                    {
+                        MealType = m.MealType.ToString(), // 转换枚举为字符串
+                        m.MealDate,
+                        MealTime = m.MealTime.ToString(@"hh\:mm") // 格式化时间
+                    })
+                    .ToListAsync();
+
+                // 序列化为JSON
+                return JsonSerializer.Serialize(meals, new JsonSerializerOptions
+                {
+                    WriteIndented = true,
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "查询饮食记录失败");
+                throw new Exception("获取饮食数据失败，请检查网络连接", ex);
+            }
+        }
+
+
+
+
         /// <summary>
         /// 获取用户某日的所有餐食记录
         /// </summary>

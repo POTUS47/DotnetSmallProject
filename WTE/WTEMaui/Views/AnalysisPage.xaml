@@ -19,7 +19,7 @@
                             BackgroundColor="Transparent"
                             TextColor="#512BD4"
                             FontSize="18"
-                            WidthRequest="40"
+                            WidthRequest="80"
                             HeightRequest="40"
                             Clicked="OnSettingsClicked"/>
                 </Grid>
@@ -57,7 +57,33 @@
             <Frame CornerRadius="12" Padding="12" BackgroundColor="#E8F5E9">
                 <VerticalStackLayout Spacing="8">
                     <Label Text="健康建议" FontAttributes="Bold" FontSize="18" />
-                    <Label Text="{Binding HealthAdvice}" FontSize="16" LineBreakMode="WordWrap"/>
+                    
+                    <!-- 获取建议按钮 -->
+                    <Button x:Name="GetAdviceButton"
+                            Text="获取健康建议"
+                            BackgroundColor="#4CAF50"
+                            TextColor="White"
+                            CornerRadius="8"
+                            Clicked="OnGetAdviceClicked"
+                            IsVisible="{Binding ShowGetAdviceButton}"/>
+                    
+                    <!-- 加载指示器 -->
+                    <StackLayout Orientation="Horizontal" 
+                                Spacing="10" 
+                                HorizontalOptions="Center"
+                                IsVisible="{Binding IsLoadingAdvice}">
+                        <ActivityIndicator IsRunning="{Binding IsLoadingAdvice}" 
+                                         Color="#4CAF50"/>
+                        <Label Text="正在获取健康建议..." 
+                               FontSize="14" 
+                               VerticalOptions="Center"/>
+                    </StackLayout>
+                    
+                    <!-- 健康建议内容 -->
+                    <Label Text="{Binding HealthAdvice}" 
+                           FontSize="16" 
+                           LineBreakMode="WordWrap"
+                           IsVisible="{Binding ShowHealthAdvice}"/>
                 </VerticalStackLayout>
             </Frame>
         </VerticalStackLayout>
