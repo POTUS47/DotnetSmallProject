@@ -104,8 +104,6 @@ namespace DataAccessLib.Services
             }
         }
 
-        
-
         /// <summary>
         /// 删除标签
         /// </summary>
@@ -125,6 +123,33 @@ namespace DataAccessLib.Services
             {
                 _logger?.LogError(ex, "删除标签失败: TagId={TagId}", tagId);
                 throw;
+            }
+        }
+
+        /// <summary>
+        /// 获取用户历史使用过的标签
+        /// </summary>
+        public async Task<List<Tag>> GetUserHistoryTagsAsync(int userId, int limit = 30)
+        {
+            try
+            {
+                _logger?.LogInformation("开始获取用户历史标签: UserId={UserId}, Limit={Limit}", userId, limit);
+                
+                var result = await _context.MealFoodTags
+                    .Where(mft => mft.Meal.UserId == userId)
+                    .GroupBy(mft => mft.Tag)
+                    .OrderByDescending(g => g.Count()) // 按使用频率排序
+                    .Take(limit)
+                    .Select(g => g.Key)
+                    .ToListAsync();
+                
+                _logger?.LogInformation("获取用户历史标签成功: UserId={UserId}, Count={Count}", userId, result.Count);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "获取用户历史标签失败: UserId={UserId}", userId);
+                throw new Exception($"获取历史标签失败: {ex.Message}");
             }
         }
     }
