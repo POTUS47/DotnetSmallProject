@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="WTEMaui.Views.SettingsPage"
+             Title="个人设置">
+    
+    <Grid RowDefinitions="Auto,*">
+        <!-- 标题栏 -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" 
+              Padding="16" BackgroundColor="#512BD4">
+            <Button Grid.Column="0"
+                    Text="←"
+                    BackgroundColor="Transparent"
+                    TextColor="White"
+                    FontSize="20"
+                    WidthRequest="40"
+                    HeightRequest="40"
+                    Clicked="OnBackClicked"/>
+            
+            <Label Grid.Column="1"
+                   Text="个人设置"
+                   TextColor="White"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"/>
+            
+            <Button Grid.Column="2"
+                    Text="保存"
+                    BackgroundColor="Transparent"
+                    TextColor="White"
+                    FontSize="16"
+                    WidthRequest="60"
+                    HeightRequest="40"
+                    Clicked="OnSaveClicked"/>
+        </Grid>
+        
+        <!-- 内容区域 -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="20" Padding="20">
+                
+                <!-- 用户基本信息 -->
+                <Frame CornerRadius="12" Padding="16" BackgroundColor="#F8F9FA">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="基本信息" FontAttributes="Bold" FontSize="18" />
+                        
+                        <Label Text="{Binding UserName, StringFormat='用户名: {0}'}" FontSize="16" />
+                        <Label Text="{Binding UserEmail, StringFormat='邮箱: {0}'}" FontSize="16" />
+                    </VerticalStackLayout>
+                </Frame>
+                
+                <!-- 身体数据 -->
+                <Frame CornerRadius="12" Padding="16" BackgroundColor="White">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="身体数据" FontAttributes="Bold" FontSize="18" />
+                        
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                            <VerticalStackLayout Grid.Column="0" Spacing="8">
+                                <Label Text="身高 (cm)" FontSize="14" />
+                                <Entry x:Name="HeightEntry" 
+                                       Text="{Binding Height}" 
+                                       Placeholder="请输入身高"
+                                       Keyboard="Numeric" />
+                            </VerticalStackLayout>
+                            
+                            <VerticalStackLayout Grid.Column="1" Spacing="8">
+                                <Label Text="体重 (kg)" FontSize="14" />
+                                <Entry x:Name="WeightEntry" 
+                                       Text="{Binding Weight}" 
+                                       Placeholder="请输入体重"
+                                       Keyboard="Numeric" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Frame>
+                
+                <!-- 健康目标 -->
+                <Frame CornerRadius="12" Padding="16" BackgroundColor="White">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="健康目标" FontAttributes="Bold" FontSize="18" />
+                        
+                        <Label Text="请选择您的健康目标:" FontSize="14" />
+                        <Picker x:Name="HealthGoalPicker" 
+                                Title="选择健康目标"
+                                ItemsSource="{Binding HealthGoalOptions}"
+                                SelectedItem="{Binding SelectedHealthGoal, Mode=TwoWay}"
+                                SelectedIndexChanged="OnHealthGoalPickerChanged" />
+                        
+                        <Label Text="或自定义健康目标:" FontSize="14" 
+                               IsVisible="{Binding IsCustomHealthGoal}" />
+                        <Entry x:Name="CustomHealthGoalEntry" 
+                               Text="{Binding CustomHealthGoal}" 
+                               Placeholder="请输入您的健康目标"
+                               IsVisible="{Binding IsCustomHealthGoal}" />
+                    </VerticalStackLayout>
+                </Frame>
+                
+                <!-- 过敏源 -->
+                <Frame CornerRadius="12" Padding="16" BackgroundColor="White">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="过敏源" FontAttributes="Bold" FontSize="18" />
+                        
+                        <Label Text="请选择您的过敏源 (可多选):" FontSize="14" />
+                        
+                        <!-- 过敏源复选框 -->
+                        <HorizontalStackLayout>
+                            <CheckBox IsChecked="{Binding Allergies.Peanut}" />
+                            <Label Text="花生" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout>
+                            <CheckBox IsChecked="{Binding Allergies.Nuts}" />
+                            <Label Text="坚果" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout>
+                            <CheckBox IsChecked="{Binding Allergies.Seafood}" />
+                            <Label Text="海鲜" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout>
+                            <CheckBox IsChecked="{Binding Allergies.Eggs}" />
+                            <Label Text="鸡蛋" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout>
+                            <CheckBox IsChecked="{Binding Allergies.Milk}" />
+                            <Label Text="牛奶" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout>
+                            <CheckBox IsChecked="{Binding Allergies.Soy}" />
+                            <Label Text="大豆" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout>
+                            <CheckBox IsChecked="{Binding Allergies.Wheat}" />
+                            <Label Text="小麦" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout>
+                            <CheckBox IsChecked="{Binding Allergies.Other}" />
+                            <Label Text="其他" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                        
+                        <Label Text="其他过敏源:" FontSize="14" 
+                               IsVisible="{Binding Allergies.Other}" />
+                        <Entry x:Name="OtherAllergiesEntry" 
+                               Text="{Binding OtherAllergiesText}" 
+                               Placeholder="请输入其他过敏源"
+                               IsVisible="{Binding Allergies.Other}" />
+                    </VerticalStackLayout>
+                </Frame>
+                
+                <!-- 加载指示器 -->
+                <ActivityIndicator x:Name="LoadingIndicator"
+                                  IsRunning="False"
+                                  IsVisible="False"
+                                  HorizontalOptions="Center" />
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage> 

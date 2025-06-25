@@ -1,4 +1,5 @@
 ﻿using Microsoft.Maui.Controls;
+using WTEMaui.Views;
 
 namespace WTEMaui
 {
@@ -7,6 +8,9 @@ namespace WTEMaui
         public MainTabShell()
         {
             InitializeComponent();
+            
+            // 注册路由
+            Routing.RegisterRoute(nameof(SettingsPage), typeof(SettingsPage));
         }
     }
 }

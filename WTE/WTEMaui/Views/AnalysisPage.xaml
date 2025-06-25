@@ -8,10 +8,21 @@
         <VerticalStackLayout Spacing="16" Padding="16">
             <!-- 用户信息 -->
             <Frame CornerRadius="12" Padding="8" BackgroundColor="#F5F5F5">
-                <HorizontalStackLayout Spacing="12">
-                    <Image Source="dotnet_bot.png" WidthRequest="48" HeightRequest="48" />
-                    <Label Text="{Binding UserName}" FontSize="20" VerticalOptions="Center" />
-                </HorizontalStackLayout>
+                <Grid ColumnDefinitions="*,Auto">
+                    <HorizontalStackLayout Grid.Column="0" Spacing="12">
+                        <Image Source="dotnet_bot.png" WidthRequest="48" HeightRequest="48" />
+                        <Label Text="{Binding UserName}" FontSize="20" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                    
+                    <Button Grid.Column="1"
+                            Text="⚙️"
+                            BackgroundColor="Transparent"
+                            TextColor="#512BD4"
+                            FontSize="18"
+                            WidthRequest="40"
+                            HeightRequest="40"
+                            Clicked="OnSettingsClicked"/>
+                </Grid>
             </Frame>
             
             <!-- 日历控件 -->

@@ -3,8 +3,25 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="WTEMaui.Views.RecommendPage"
              Title="推荐">
+    
     <VerticalStackLayout Spacing="24" Padding="24">
-        <Label Text="想吃什么？" FontSize="24" HorizontalOptions="Center" />
+        <!-- 标题栏 -->
+        <Grid ColumnDefinitions="*,Auto">
+            <Label Text="想吃什么？" 
+                   Grid.Column="0"
+                   FontSize="24" 
+                   HorizontalOptions="Start" />
+            
+            <Button Grid.Column="1"
+                    Text="⚙️"
+                    BackgroundColor="Transparent"
+                    TextColor="#512BD4"
+                    FontSize="20"
+                    WidthRequest="40"
+                    HeightRequest="40"
+                    Clicked="OnSettingsClicked"/>
+        </Grid>
+        
         <Button Text="随机选一个" x:Name="RandomBtn" Clicked="OnRandomClicked" FontSize="20" />
         <Button Text="吃健康点" x:Name="HealthyBtn" Clicked="OnHealthyClicked" FontSize="20" />
         <Frame CornerRadius="12" Padding="16" BackgroundColor="#F5F5F5" IsVisible="{Binding HasResult}">
