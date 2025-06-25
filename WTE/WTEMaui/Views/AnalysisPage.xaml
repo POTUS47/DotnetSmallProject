@@ -20,7 +20,7 @@
                             TextColor="#512BD4"
                             FontSize="18"
                             WidthRequest="80"
-                            HeightRequest="40"
+                            HeightRequest="55"
                             Clicked="OnSettingsClicked"/>
                 </Grid>
             </Frame>
