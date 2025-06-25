@@ -11,4 +11,10 @@
         <ShellContent Title="分析" Icon="chart.png" ContentTemplate="{DataTemplate views:AnalysisPage}" />
     </TabBar>
 
+    <!-- 设置页面路由 -->
+    <ShellContent
+        Title="设置"
+        ContentTemplate="{DataTemplate views:SettingsPage}"
+        Route="SettingsPage" />
+
 </Shell>

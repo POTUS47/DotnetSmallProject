@@ -122,6 +122,18 @@ namespace WTEMaui.Views
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        private async void OnSettingsClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                await Shell.Current.GoToAsync(nameof(SettingsPage));
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("错误", "无法打开设置页面", "确定");
+            }
+        }
+
         public class DailyStatVM
         {
             public string Date { get; set; }

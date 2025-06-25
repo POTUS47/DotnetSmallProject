@@ -933,6 +933,18 @@ namespace WTEMaui.Views
 
         #endregion
 
+        private async void OnSettingsClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                await Shell.Current.GoToAsync(nameof(SettingsPage));
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "跳转到设置页面失败");
+                await DisplayAlert("错误", "无法打开设置页面", "确定");
+            }
+        }
         #region 手动输入相关方法
 
         /// <summary>

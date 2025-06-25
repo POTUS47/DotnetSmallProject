@@ -13,12 +13,23 @@
                   Padding="20">
 
                 <!-- 第0行：标题 -->
-                <Label Text="食物识别"
-                       Grid.Row="0"
-                       HorizontalOptions="Center"
-                       FontSize="24"
-                       FontAttributes="Bold"
-                       TextColor="#512BD4"/>
+                <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+                    <Label Text="食物识别"
+                           Grid.Column="0"
+                           HorizontalOptions="Start"
+                           FontSize="24"
+                           FontAttributes="Bold"
+                           TextColor="#512BD4"/>
+                    
+                    <Button Grid.Column="1"
+                            Text="⚙️"
+                            BackgroundColor="Transparent"
+                            TextColor="#512BD4"
+                            FontSize="20"
+                            WidthRequest="40"
+                            HeightRequest="40"
+                            Clicked="OnSettingsClicked"/>
+                </Grid>
 
                 <!-- 第1行：拍照按钮 -->
                 <Button Text="📷 拍照识别食物"
