@@ -106,9 +106,10 @@ namespace WTEMaui.Views
         private async void OnGetAdviceClicked(object sender, EventArgs e)
         {
             IsLoadingAdvice = true;
+            HealthAdvice = ""; // 清空之前的内容
             try
             {
-                await AnalysisLLM();
+                await AnalysisLLMStream();
             }
             catch (Exception ex)
             {
@@ -121,6 +122,31 @@ namespace WTEMaui.Views
             }
         }
 
+        private async Task AnalysisLLMStream()
+        {
+            var history = await _mealService.GetUserMealsJsonAsync(_userId);
+            try
+            {
+                Console.WriteLine("正在调用大模型分析饮食数据...");
+
+                // 使用流式输出
+                await _healthAnalysisService.AnalyzeMealTimeStreamAsync(history, (content) =>
+                {
+                    // 在主线程更新UI
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        HealthAdvice += content;
+                    });
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"错误: {ex.Message}");
+                throw;
+            }
+        }
+
+        // 保留原有的非流式方法作为备用
         private async Task AnalysisLLM()
         {
             var history = await _mealService.GetUserMealsJsonAsync(_userId);
@@ -128,14 +154,13 @@ namespace WTEMaui.Views
             {
                 Console.WriteLine("正在调用大模型分析饮食数据...");
 
-                // ✅ 调用分析方法
                 string advice = await _healthAnalysisService.AnalyzeMealTimeAsync(history);
                 HealthAdvice = advice;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"错误: {ex.Message}");
-                throw; // 重新抛出异常让调用方处理
+                throw;
             }
         }
 
