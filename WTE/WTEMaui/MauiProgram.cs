@@ -62,6 +62,7 @@ namespace WTEMaui
             builder.Services.AddTransient<MainPage>();
             builder.Services.AddTransient<LoginPage>();
             builder.Services.AddTransient<RegisterPage>();
+            builder.Services.AddTransient<AnalysisPage>();
 
 #if DEBUG
             builder.Logging.AddDebug();

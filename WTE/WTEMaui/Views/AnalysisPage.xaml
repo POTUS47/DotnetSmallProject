@@ -4,36 +4,52 @@
              xmlns:sf="clr-namespace:Syncfusion.Maui.Calendar;assembly=Syncfusion.Maui.Calendar"
              x:Class="WTEMaui.Views.AnalysisPage"
              Title="分析">
-    <VerticalStackLayout Spacing="16" Padding="16">
-        <!-- 用户信息 -->
-        <Frame CornerRadius="12" Padding="8" BackgroundColor="#F5F5F5">
-            <HorizontalStackLayout Spacing="12">
-                <Image Source="dotnet_bot.png" WidthRequest="48" HeightRequest="48" />
-                <Label Text="{Binding UserName}" FontSize="20" VerticalOptions="Center" />
-            </HorizontalStackLayout>
-        </Frame>
-        <!-- 日历控件 -->
-        <sf:SfCalendar x:Name="FoodCalendar"
-                      View="Month"
-                      SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
-                      SelectionChanged="OnCalendarSelectionChanged"/>
-        <!-- 选中日期的食物详情 -->
-        <Label Text="{Binding SelectedDate, StringFormat='选中日期: {0:yyyy-MM-dd}'}" FontAttributes="Bold"/>
-        <CollectionView ItemsSource="{Binding SelectedDayFoods}">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Frame Margin="4" Padding="8" BorderColor="#DDD" CornerRadius="8">
-                        <VerticalStackLayout>
-                            <Label Text="{Binding}" />
-                        </VerticalStackLayout>
-                    </Frame>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
-        <!-- 健康建议 -->
-        <Frame CornerRadius="12" Padding="12" BackgroundColor="#E8F5E9">
-            <Label Text="健康建议" FontAttributes="Bold" FontSize="18" />
-            <Label Text="{Binding HealthAdvice}" FontSize="16" />
-        </Frame>
-    </VerticalStackLayout>
+    <ScrollView>
+        <VerticalStackLayout Spacing="16" Padding="16">
+            <!-- 用户信息 -->
+            <Frame CornerRadius="12" Padding="8" BackgroundColor="#F5F5F5">
+                <HorizontalStackLayout Spacing="12">
+                    <Image Source="dotnet_bot.png" WidthRequest="48" HeightRequest="48" />
+                    <Label Text="{Binding UserName}" FontSize="20" VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </Frame>
+            
+            <!-- 日历控件 -->
+            <Frame CornerRadius="12" Padding="8" BackgroundColor="White">
+                <sf:SfCalendar x:Name="FoodCalendar"
+                              View="Month"
+                              HeightRequest="250"
+                              CornerRadius="8"
+                              FirstDayOfWeek="Monday"
+                              SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
+                              SelectionChanged="OnCalendarSelectionChanged"/>
+            </Frame>
+            
+            <!-- 选中日期的食物详情 -->
+            <Frame CornerRadius="12" Padding="12" BackgroundColor="#F8F9FA">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="{Binding SelectedDate, StringFormat='选中日期: {0:yyyy-MM-dd}'}" 
+                           FontAttributes="Bold" 
+                           FontSize="16"/>
+                    <CollectionView ItemsSource="{Binding SelectedDayFoods}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Frame Margin="20,40,20,40" Padding="8" BorderColor="#DDD" CornerRadius="6">
+                                    <Label Text="{Binding}" FontSize="14"/>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Frame>
+            
+            <!-- 健康建议 -->
+            <Frame CornerRadius="12" Padding="12" BackgroundColor="#E8F5E9">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="健康建议" FontAttributes="Bold" FontSize="18" />
+                    <Label Text="{Binding HealthAdvice}" FontSize="16" LineBreakMode="WordWrap"/>
+                </VerticalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

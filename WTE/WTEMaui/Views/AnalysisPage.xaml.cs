@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Syncfusion.Maui.Calendar;
 using System.ComponentModel;
+using System.Globalization;
 
 namespace WTEMaui.Views
 {
@@ -48,6 +49,10 @@ namespace WTEMaui.Views
                 InitializeComponent();
                 _analysisService = analysisService;
                 BindingContext = this;
+
+                // 设置日历的标识符
+                FoodCalendar.Identifier = CalendarIdentifier.Gregorian;
+
                 _startDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-30));
                 _endDate = DateOnly.FromDateTime(DateTime.Today);
                 LoadData();
