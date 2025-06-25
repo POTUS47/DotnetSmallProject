@@ -20,7 +20,6 @@
                               View="Month"
                               HeightRequest="250"
                               CornerRadius="8"
-                              FirstDayOfWeek="Monday"
                               SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
                               SelectionChanged="OnCalendarSelectionChanged"/>
             </Frame>

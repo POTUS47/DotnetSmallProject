@@ -45,8 +45,8 @@ namespace WTEMaui.Views
         public AnalysisPage(AnalysisService analysisService)
         {
             try
-            {
-                InitializeComponent();
+        {
+            InitializeComponent();
                 _analysisService = analysisService;
                 BindingContext = this;
 

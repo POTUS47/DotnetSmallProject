@@ -3,13 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="WTEMaui.Views.RecommendPage"
              Title="推荐">
-
-    <ScrollView>
-        <VerticalStackLayout Spacing="20" Padding="20">
-            <Label Text="这是推荐"
-                   HorizontalOptions="Center"
-                   FontSize="20" />
-        </VerticalStackLayout>
-    </ScrollView>
-
+    <VerticalStackLayout Spacing="24" Padding="24">
+        <Label Text="想吃什么？" FontSize="24" HorizontalOptions="Center" />
+        <Button Text="随机选一个" x:Name="RandomBtn" Clicked="OnRandomClicked" FontSize="20" />
+        <Button Text="吃健康点" x:Name="HealthyBtn" Clicked="OnHealthyClicked" FontSize="20" />
+        <Frame CornerRadius="12" Padding="16" BackgroundColor="#F5F5F5" IsVisible="{Binding HasResult}">
+            <Label Text="推荐结果" FontAttributes="Bold" FontSize="18" />
+            <Label Text="{Binding RecommendResult}" FontSize="20" />
+        </Frame>
+        <Label Text="{Binding StatusMsg}" FontSize="16" TextColor="Gray" />
+    </VerticalStackLayout>
 </ContentPage>
