@@ -30,11 +30,23 @@
                         FontSize="18"
                         Clicked="OnTakePhotoClicked"/>
 
+                <!-- 第1.5行：从相册选择按钮 -->
+                <Button Text="🖼️ 从相册选择"
+                        Grid.Row="2"
+                        BackgroundColor="#FF6B35"
+                        TextColor="White"
+                        CornerRadius="10"
+                        HeightRequest="60"
+                        FontSize="18"
+                        Margin="0,5,0,0"
+                        Clicked="OnSelectFromGalleryClicked"/>
+
                 <!-- 第2行：图片预览 -->
                 <Frame Grid.Row="2"
                        CornerRadius="15"
                        Padding="0"
                        BorderColor="#DDDDDD"
+                       Margin="0,10,0,0"
                        IsVisible="{Binding Source={x:Reference PreviewImage}, Path=IsVisible}">
                     <Image x:Name="PreviewImage"
                            Aspect="AspectFill"
