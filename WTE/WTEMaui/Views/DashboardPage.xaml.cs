@@ -23,6 +23,12 @@ namespace WTEMaui.Views
         private string _currentPreviewImageUrl = "";
         private string _currentPreviewFoodName = "";
 
+        // 手动输入相关变量
+        private string _selectedFoodName = "";
+        private List<DataAccessLib.Models.Tag> _selectedTags = new List<DataAccessLib.Models.Tag>();
+        private List<DataAccessLib.Models.Food> _userHistoryFoods = new List<DataAccessLib.Models.Food>();
+        private List<DataAccessLib.Models.Tag> _userHistoryTags = new List<DataAccessLib.Models.Tag>();
+
         public DashboardPage(
             ImageRecognitionService imageService,
             OssService ossService,
@@ -939,5 +945,475 @@ namespace WTEMaui.Views
                 await DisplayAlert("错误", "无法打开设置页面", "确定");
             }
         }
+        #region 手动输入相关方法
+
+        /// <summary>
+        /// 手动输入按钮点击事件
+        /// </summary>
+        private async void OnManualInputClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                LoadingIndicator.IsRunning = true;
+                
+                // 重置选择状态
+                ResetManualInputState();
+                
+                // 先显示手动输入弹窗
+                await ShowManualInputOverlayAsync();
+                
+                // 后台异步加载用户历史数据
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await LoadUserHistoryDataAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger?.LogError(ex, "后台加载用户历史数据失败");
+                        // 在UI线程上显示错误信息
+                        MainThread.BeginInvokeOnMainThread(async () =>
+                        {
+                            await DisplayAlert("提示", "加载历史数据失败，但您仍可以手动输入", "确定");
+                        });
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "打开手动输入界面失败");
+                await DisplayAlert("错误", $"无法打开手动输入界面: {ex.Message}", "确定");
+            }
+            finally
+            {
+                LoadingIndicator.IsRunning = false;
+            }
+        }
+
+        /// <summary>
+        /// 加载用户历史数据
+        /// </summary>
+        private async Task LoadUserHistoryDataAsync()
+        {
+            try
+            {
+                int currentUserId = 1; // 临时硬编码
+                
+                _logger?.LogInformation("开始加载用户历史数据，用户ID: {UserId}", currentUserId);
+                
+                // 创建新的临时列表来避免在UI线程上的竞争条件
+                List<DataAccessLib.Models.Food> tempFoods = new List<DataAccessLib.Models.Food>();
+                List<DataAccessLib.Models.Tag> tempTags = new List<DataAccessLib.Models.Tag>();
+                
+                try
+                {
+                    // 串行加载历史食物
+                    tempFoods = await _foodService.GetUserHistoryFoodsAsync(currentUserId, 15);
+                    _logger?.LogInformation("加载历史食物成功: {Count} 个", tempFoods.Count);
+                }
+                catch (Exception ex)
+                {
+                    _logger?.LogWarning(ex, "加载历史食物失败，使用空列表");
+                    tempFoods = new List<DataAccessLib.Models.Food>();
+                }
+                
+                // 添加小延迟确保数据库连接释放
+                await Task.Delay(100);
+                
+                try
+                {
+                    // 串行加载历史标签
+                    tempTags = await _tagService.GetUserHistoryTagsAsync(currentUserId, 20);
+                    _logger?.LogInformation("加载历史标签成功: {Count} 个", tempTags.Count);
+                }
+                catch (Exception ex)
+                {
+                    _logger?.LogWarning(ex, "加载历史标签失败，使用空列表");
+                    tempTags = new List<DataAccessLib.Models.Tag>();
+                }
+                
+                // 在UI线程上更新界面
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    try
+                    {
+                        _userHistoryFoods = tempFoods;
+                        _userHistoryTags = tempTags;
+                        
+                        // 更新UI
+                        HistoryFoodCollectionView.ItemsSource = _userHistoryFoods;
+                        HistoryTagCollectionView.ItemsSource = _userHistoryTags;
+                        
+                        _logger?.LogInformation("UI更新完成: {FoodCount} 个食物, {TagCount} 个标签", 
+                            _userHistoryFoods.Count, _userHistoryTags.Count);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger?.LogError(ex, "更新UI失败");
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "加载用户历史数据失败");
+                
+                // 在UI线程上设置空列表避免UI报错
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    _userHistoryFoods = new List<DataAccessLib.Models.Food>();
+                    _userHistoryTags = new List<DataAccessLib.Models.Tag>();
+                    
+                    HistoryFoodCollectionView.ItemsSource = _userHistoryFoods;
+                    HistoryTagCollectionView.ItemsSource = _userHistoryTags;
+                });
+                
+                throw new Exception($"加载历史数据失败: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 重置手动输入状态
+        /// </summary>
+        private void ResetManualInputState()
+        {
+            _selectedFoodName = "";
+            _selectedTags.Clear();
+            
+            ManualFoodNameEntry.Text = "";
+            ManualTagEntry.Text = "";
+            
+            UpdateSelectedTagsDisplay();
+        }
+
+        /// <summary>
+        /// 显示手动输入弹窗
+        /// </summary>
+        private async Task ShowManualInputOverlayAsync()
+        {
+            ManualInputOverlay.IsVisible = true;
+            ManualInputOverlay.Opacity = 0;
+            await ManualInputOverlay.FadeTo(1, 300);
+        }
+
+        /// <summary>
+        /// 关闭手动输入弹窗
+        /// </summary>
+        private async void OnCloseManualInputClicked(object sender, EventArgs e)
+        {
+            await CloseManualInputOverlayAsync();
+        }
+
+        /// <summary>
+        /// 点击遮罩层关闭手动输入弹窗
+        /// </summary>
+        private async void OnManualInputOverlayTapped(object sender, EventArgs e)
+        {
+            await CloseManualInputOverlayAsync();
+        }
+
+        /// <summary>
+        /// 关闭手动输入弹窗
+        /// </summary>
+        private async Task CloseManualInputOverlayAsync()
+        {
+            try
+            {
+                await ManualInputOverlay.FadeTo(0, 200);
+                ManualInputOverlay.IsVisible = false;
+                
+                _logger?.LogInformation("关闭手动输入弹窗");
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "关闭手动输入弹窗失败");
+            }
+        }
+
+        /// <summary>
+        /// 历史食物点击事件
+        /// </summary>
+        private void OnHistoryFoodTapped(object sender, EventArgs e)
+        {
+            try
+            {
+                if (sender is Border border && border.BindingContext is DataAccessLib.Models.Food food)
+                {
+                    _selectedFoodName = food.Name;
+                    ManualFoodNameEntry.Text = food.Name;
+                    
+                    // 更新视觉状态
+                    UpdateFoodSelectionVisual();
+                    
+                    _logger?.LogInformation("选择历史食物: {FoodName}", food.Name);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "选择历史食物失败");
+            }
+        }
+
+        /// <summary>
+        /// 历史标签点击事件
+        /// </summary>
+        private void OnHistoryTagTapped(object sender, EventArgs e)
+        {
+            try
+            {
+                if (sender is Border border && border.BindingContext is DataAccessLib.Models.Tag tag)
+                {
+                    // 切换标签选择状态
+                    if (_selectedTags.Any(t => t.TagId == tag.TagId))
+                    {
+                        // 取消选择
+                        _selectedTags.RemoveAll(t => t.TagId == tag.TagId);
+                        border.BackgroundColor = Color.FromArgb("#E3F2FD");
+                        border.Stroke = Color.FromArgb("#2196F3");
+                    }
+                    else
+                    {
+                        // 选择标签
+                        _selectedTags.Add(tag);
+                        border.BackgroundColor = Color.FromArgb("#4CAF50");
+                        border.Stroke = Color.FromArgb("#4CAF50");
+                    }
+                    
+                    UpdateSelectedTagsDisplay();
+                    
+                    _logger?.LogInformation("切换标签选择: {TagName}, 当前选中: {Count} 个", 
+                        tag.TagName, _selectedTags.Count);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "选择历史标签失败");
+            }
+        }
+
+        /// <summary>
+        /// 添加新标签按钮点击事件
+        /// </summary>
+        private void OnAddNewTagClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                var newTagName = ManualTagEntry.Text?.Trim();
+                if (string.IsNullOrEmpty(newTagName))
+                {
+                    DisplayAlert("提示", "请输入标签名称", "确定");
+                    return;
+                }
+
+                // 检查是否已经选择过
+                if (_selectedTags.Any(t => t.TagName.Equals(newTagName, StringComparison.OrdinalIgnoreCase)))
+                {
+                    DisplayAlert("提示", "该标签已选择", "确定");
+                    return;
+                }
+
+                // 创建临时标签对象（ID为0表示新标签）
+                var newTag = new DataAccessLib.Models.Tag
+                {
+                    TagId = 0,
+                    TagName = newTagName
+                };
+
+                _selectedTags.Add(newTag);
+                ManualTagEntry.Text = "";
+                
+                UpdateSelectedTagsDisplay();
+                
+                _logger?.LogInformation("添加新标签: {TagName}", newTagName);
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "添加新标签失败");
+            }
+        }
+
+        /// <summary>
+        /// 移除选中标签按钮点击事件
+        /// </summary>
+        private void OnRemoveSelectedTagClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                if (sender is Button button && button.BindingContext is DataAccessLib.Models.Tag tag)
+                {
+                    _selectedTags.RemoveAll(t => t.TagId == tag.TagId && t.TagName == tag.TagName);
+                    UpdateSelectedTagsDisplay();
+                    
+                    // 更新历史标签的视觉状态
+                    UpdateTagSelectionVisual();
+                    
+                    _logger?.LogInformation("移除选中标签: {TagName}", tag.TagName);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "移除选中标签失败");
+            }
+        }
+
+        /// <summary>
+        /// 保存手动输入按钮点击事件
+        /// </summary>
+        private async void OnSaveManualInputClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                // 获取食物名称
+                var foodName = !string.IsNullOrEmpty(_selectedFoodName) 
+                    ? _selectedFoodName 
+                    : ManualFoodNameEntry.Text?.Trim();
+
+                if (string.IsNullOrEmpty(foodName))
+                {
+                    await DisplayAlert("提示", "请选择或输入食物名称", "确定");
+                    return;
+                }
+
+                LoadingIndicator.IsRunning = true;
+
+                // 获取当前用户ID
+                int currentUserId = 1; // 临时硬编码
+
+                _logger?.LogInformation("开始保存手动输入的餐食记录 - 食物: {FoodName}, 标签数量: {TagCount}", 
+                    foodName, _selectedTags.Count);
+
+                // 串行执行所有数据库操作，避免并发问题
+                await ExecuteDatabaseOperationsAsync(currentUserId, foodName);
+
+                // 显示成功消息
+                var tagNames = _selectedTags.Any() 
+                    ? string.Join(", ", _selectedTags.Select(t => t.TagName))
+                    : "无";
+
+                var currentDate = DateOnly.FromDateTime(DateTime.Now);
+                var currentTime = TimeOnly.FromDateTime(DateTime.Now);
+                var mealType = GetMealTypeByTime(currentTime);
+
+                var successMessage = $"餐食记录已保存成功！\n\n" +
+                                   $"🍽️ 餐食类型: {mealType}\n" +
+                                   $"🥘 食物名称: {foodName}\n" +
+                                   $"🏷️ 食物标签: {tagNames}\n" +
+                                   $"📅 记录时间: {currentDate} {currentTime:HH:mm}";
+
+                await DisplayAlert("保存成功", successMessage, "确定");
+
+                // 关闭弹窗并刷新历史记录
+                await CloseManualInputOverlayAsync();
+                await LoadMealHistoryAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "保存手动输入的餐食记录失败");
+                
+                var errorMessage = ex.InnerException != null 
+                    ? $"{ex.Message}\n详细信息: {ex.InnerException.Message}" 
+                    : ex.Message;
+                    
+                await DisplayAlert("保存失败", $"保存时出错:\n{errorMessage}", "确定");
+            }
+            finally
+            {
+                LoadingIndicator.IsRunning = false;
+            }
+        }
+
+        /// <summary>
+        /// 串行执行数据库操作
+        /// </summary>
+        private async Task ExecuteDatabaseOperationsAsync(int currentUserId, string foodName)
+        {
+            try
+            {
+                // 1. 获取或创建食物记录
+                int foodId = await GetOrCreateFoodAsync(foodName);
+                _logger?.LogInformation("获取到食物ID: {FoodId}", foodId);
+                
+                // 添加小延迟确保数据库操作完成
+                await Task.Delay(50);
+
+                // 2. 创建餐食记录
+                var currentDate = DateOnly.FromDateTime(DateTime.Now);
+                var currentTime = TimeOnly.FromDateTime(DateTime.Now);
+                var mealType = GetMealTypeByTime(currentTime);
+
+                var meal = await _mealService.AddMealAsync(currentUserId, mealType, currentDate, currentTime);
+                _logger?.LogInformation("创建餐食记录成功: MealId={MealId}", meal.MealId);
+                
+                await Task.Delay(50);
+
+                // 3. 添加食物到餐食（不带图片）
+                await _mealService.AddFoodToMealAsync(meal.MealId, foodId, null);
+                _logger?.LogInformation("添加食物到餐食成功: MealId={MealId}, FoodId={FoodId}", meal.MealId, foodId);
+                
+                await Task.Delay(50);
+
+                // 4. 处理标签（串行处理每个标签）
+                foreach (var selectedTag in _selectedTags)
+                {
+                    try
+                    {
+                        int tagId;
+                        if (selectedTag.TagId == 0) // 新标签
+                        {
+                            tagId = await GetOrCreateTagAsync(selectedTag.TagName);
+                            await Task.Delay(50); // 确保标签创建完成
+                        }
+                        else // 已有标签
+                        {
+                            tagId = selectedTag.TagId;
+                        }
+
+                        await _mealService.AddTagToMealFoodAsync(meal.MealId, foodId, tagId);
+                        _logger?.LogInformation("添加标签到餐食成功: MealId={MealId}, FoodId={FoodId}, TagId={TagId}", 
+                            meal.MealId, foodId, tagId);
+                            
+                        await Task.Delay(50); // 每个标签操作之间添加延迟
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger?.LogWarning(ex, "添加标签失败: {TagName}", selectedTag.TagName);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "数据库操作失败");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 更新食物选择的视觉效果
+        /// </summary>
+        private void UpdateFoodSelectionVisual()
+        {
+            // 这里可以添加视觉反馈，比如高亮选中的食物
+            // 由于CollectionView的限制，暂时通过文本框显示选择结果
+        }
+
+        /// <summary>
+        /// 更新标签选择的视觉效果
+        /// </summary>
+        private void UpdateTagSelectionVisual()
+        {
+            // 重置所有历史标签的视觉状态
+            // 注意：这里需要遍历UI元素，实际实现可能需要更复杂的逻辑
+        }
+
+        /// <summary>
+        /// 更新选中标签的显示
+        /// </summary>
+        private void UpdateSelectedTagsDisplay()
+        {
+            SelectedTagsCollectionView.ItemsSource = _selectedTags.ToList();
+            SelectedTagsLayout.IsVisible = _selectedTags.Any();
+        }
+
+        #endregion
     }
 }

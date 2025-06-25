@@ -104,7 +104,32 @@ namespace DataAccessLib.Services
             }
         }
 
-        
+        /// <summary>
+        /// 获取用户历史使用过的食物
+        /// </summary>
+        public async Task<List<Food>> GetUserHistoryFoodsAsync(int userId, int limit = 20)
+        {
+            try
+            {
+                _logger?.LogInformation("开始获取用户历史食物: UserId={UserId}, Limit={Limit}", userId, limit);
+                
+                var result = await _context.MealFoodImages
+                    .Where(mfi => mfi.Meal.UserId == userId)
+                    .GroupBy(mfi => mfi.Food)
+                    .OrderByDescending(g => g.Count()) // 按使用频率排序
+                    .Take(limit)
+                    .Select(g => g.Key)
+                    .ToListAsync();
+                
+                _logger?.LogInformation("获取用户历史食物成功: UserId={UserId}, Count={Count}", userId, result.Count);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "获取用户历史食物失败: UserId={UserId}", userId);
+                throw new Exception($"获取历史食物失败: {ex.Message}");
+            }
+        }
 
         /// <summary>
         /// 删除食物
