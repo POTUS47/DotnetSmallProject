@@ -265,10 +265,11 @@ namespace WTEMaui.Views
             {
                 LoadingIndicator.IsRunning = true;
 
-                // 获取当前用户ID (这里需要根据实际的用户管理系统获取)
-                int currentUserId = 1; // 临时硬编码，实际应该从用户会话中获取
+                // 获取当前用户ID
+                int currentUserId = App.CurrentUser?.UserId ?? 1; // 从当前登录用户获取，如果未登录则使用默认值
 
-                _logger?.LogInformation("开始保存餐食记录 - 食物: {FoodName}, 标签: {FoodTag}", _currentFoodName, _currentFoodTag);
+                _logger?.LogInformation("开始保存餐食记录 - 用户ID: {UserId}, 食物: {FoodName}, 标签: {FoodTag}", 
+                    currentUserId, _currentFoodName, _currentFoodTag);
 
                 // 1. 先检查并创建食物记录
                 int foodId = await GetOrCreateFoodAsync(_currentFoodName);
@@ -346,14 +347,14 @@ namespace WTEMaui.Views
                 _logger?.LogInformation("开始加载用餐历史");
                 
                 // 获取当前用户ID
-                int currentUserId = 1; // 临时硬编码
+                int currentUserId = App.CurrentUser?.UserId ?? 1; // 从当前登录用户获取，如果未登录则使用默认值
 
                 // 获取最近7天的用餐记录
                 var endDate = DateOnly.FromDateTime(DateTime.Today);
                 var startDate = endDate.AddDays(-7);
 
                 var mealHistory = await _mealService.GetUserMealsByDateRangeAsync(currentUserId, startDate, endDate);
-                _logger?.LogInformation("从数据库获取到 {Count} 条餐食记录", mealHistory.Count);
+                _logger?.LogInformation("从数据库获取到用户 {UserId} 的 {Count} 条餐食记录", currentUserId, mealHistory.Count);
                 
                 // 按时间倒序排列（最新的在上面）
                 var sortedHistory = mealHistory

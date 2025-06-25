@@ -12,10 +12,27 @@
 
         <!-- 标题栏 -->
         <StackLayout Grid.Row="0" Padding="20" BackgroundColor="#512BD4">
-            <Label Text="用户管理" 
-                   TextColor="White" 
-                   FontSize="20" 
-                   HorizontalOptions="Center" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <Label Grid.Column="0" Text="用户管理" 
+                       TextColor="White" 
+                       FontSize="20" 
+                       HorizontalOptions="Center" />
+                
+                <Button Grid.Column="1" 
+                        Text="登出" 
+                        BackgroundColor="Transparent"
+                        TextColor="White"
+                        BorderColor="White"
+                        BorderWidth="1"
+                        CornerRadius="5"
+                        Padding="10,5"
+                        Clicked="OnLogoutClicked" />
+            </Grid>
         </StackLayout>
 
         <!-- 用户列表 -->

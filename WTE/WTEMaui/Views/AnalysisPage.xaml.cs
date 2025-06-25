@@ -34,7 +34,7 @@ namespace WTEMaui.Views
         public ObservableCollection<string> SelectedDayFoods { get; set; } = new();
 
         private readonly AnalysisService _analysisService;
-        private readonly int _userId = 1; // TODO: 替换为实际登录用户ID
+        private readonly int _userId; // 移除硬编码，改为从当前用户获取
         private DateOnly _startDate;
         private DateOnly _endDate;
 
@@ -45,9 +45,16 @@ namespace WTEMaui.Views
         public AnalysisPage(AnalysisService analysisService)
         {
             try
-        {
-            InitializeComponent();
+            {
+                InitializeComponent();
                 _analysisService = analysisService;
+                
+                // 从当前登录用户获取用户ID
+                _userId = App.CurrentUser?.UserId ?? 1; // 如果未登录，默认使用ID=1
+                
+                // 设置用户名显示
+                UserName = App.CurrentUser?.Username ?? "未登录用户";
+                
                 BindingContext = this;
 
                 // 设置日历的标识符
