@@ -49,6 +49,40 @@ namespace WTEMaui.Views
         public bool ShowGetAdviceButton => !IsLoadingAdvice && string.IsNullOrEmpty(HealthAdvice);
         public bool ShowHealthAdvice => !string.IsNullOrEmpty(HealthAdvice);
 
+        // 添加饮食健康分析相关属性
+        private string _dietHealthAdvice = "";
+        public string DietHealthAdvice
+        {
+            get => _dietHealthAdvice;
+            set
+            {
+                if (_dietHealthAdvice != value)
+                {
+                    _dietHealthAdvice = value;
+                    OnPropertyChanged(nameof(DietHealthAdvice));
+                    OnPropertyChanged(nameof(ShowDietHealthAdvice));
+                }
+            }
+        }
+
+        private bool _isLoadingDietAnalysis = false;
+        public bool IsLoadingDietAnalysis
+        {
+            get => _isLoadingDietAnalysis;
+            set
+            {
+                if (_isLoadingDietAnalysis != value)
+                {
+                    _isLoadingDietAnalysis = value;
+                    OnPropertyChanged(nameof(IsLoadingDietAnalysis));
+                    OnPropertyChanged(nameof(ShowGetDietAnalysisButton));
+                }
+            }
+        }
+
+        public bool ShowGetDietAnalysisButton => !IsLoadingDietAnalysis && string.IsNullOrEmpty(DietHealthAdvice);
+        public bool ShowDietHealthAdvice => !string.IsNullOrEmpty(DietHealthAdvice);
+
         private readonly MealService _mealService;
         private readonly HealthAnalysisService _healthAnalysisService;
 
@@ -109,7 +143,7 @@ namespace WTEMaui.Views
             HealthAdvice = ""; // 清空之前的内容
             try
             {
-                await AnalysisLLMStream();
+                await AnalyzeMealTimeStream(); // 修复方法名称
             }
             catch (Exception ex)
             {
@@ -122,12 +156,33 @@ namespace WTEMaui.Views
             }
         }
 
-        private async Task AnalysisLLMStream()
+        // 添加饮食健康分析按钮点击事件
+        private async void OnGetDietAnalysisClicked(object sender, EventArgs e)
+        {
+            IsLoadingDietAnalysis = true;
+            DietHealthAdvice = ""; // 清空之前的内容
+            try
+            {
+                await AnalyzeDietHealthStream();
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("错误", $"获取饮食健康分析失败: {ex.Message}", "确定");
+                DietHealthAdvice = "获取饮食健康分析失败，请稍后重试";
+            }
+            finally
+            {
+                IsLoadingDietAnalysis = false;
+            }
+        }
+
+        // 添加缺失的用餐时间分析流式方法
+        private async Task AnalyzeMealTimeStream()
         {
             var history = await _mealService.GetUserMealsJsonAsync(_userId);
             try
             {
-                Console.WriteLine("正在调用大模型分析饮食数据...");
+                Console.WriteLine("正在调用大模型分析饮食时间数据...");
 
                 // 使用流式输出
                 await _healthAnalysisService.AnalyzeMealTimeStreamAsync(history, (content) =>
@@ -136,6 +191,32 @@ namespace WTEMaui.Views
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
                         HealthAdvice += content;
+                    });
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"错误: {ex.Message}");
+                throw;
+            }
+        }
+
+        // 添加饮食健康分析方法
+        private async Task AnalyzeDietHealthStream()
+        {
+            // 使用优化版本的方法
+            var detailedData = await _mealService.GetUserDetailedMealsJsonOptimizedAsync(_userId);
+            try
+            {
+                Console.WriteLine("正在调用大模型分析饮食健康数据...");
+
+                // 使用流式输出
+                await _healthAnalysisService.AnalyzeDietHealthStreamAsync(detailedData, (content) =>
+                {
+                    // 在主线程更新UI
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        DietHealthAdvice += content;
                     });
                 });
             }
@@ -156,6 +237,25 @@ namespace WTEMaui.Views
 
                 string advice = await _healthAnalysisService.AnalyzeMealTimeAsync(history);
                 HealthAdvice = advice;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"错误: {ex.Message}");
+                throw;
+            }
+        }
+
+        // 保留原有的非流式方法作为备用
+        private async Task AnalyzeDietHealth()
+        {
+            // 使用优化版本的方法
+            var detailedData = await _mealService.GetUserDetailedMealsJsonOptimizedAsync(_userId);
+            try
+            {
+                Console.WriteLine("正在调用大模型分析饮食健康数据...");
+
+                string advice = await _healthAnalysisService.AnalyzeDietHealthAsync(detailedData);
+                DietHealthAdvice = advice;
             }
             catch (Exception ex)
             {

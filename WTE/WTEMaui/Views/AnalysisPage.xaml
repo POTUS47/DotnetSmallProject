@@ -56,11 +56,11 @@
             <!-- 健康建议 -->
             <Frame CornerRadius="12" Padding="12" BackgroundColor="#E8F5E9">
                 <VerticalStackLayout Spacing="8">
-                    <Label Text="健康建议" FontAttributes="Bold" FontSize="18" />
+                    <Label Text="用餐时间规律分析" FontAttributes="Bold" FontSize="18" />
                     
                     <!-- 获取建议按钮 -->
                     <Button x:Name="GetAdviceButton"
-                            Text="获取健康建议"
+                            Text="获取用餐时间建议"
                             BackgroundColor="#4CAF50"
                             TextColor="White"
                             CornerRadius="8"
@@ -86,6 +86,41 @@
                            IsVisible="{Binding ShowHealthAdvice}"/>
                 </VerticalStackLayout>
             </Frame>
+
+            <!-- 饮食健康分析 -->
+            <Frame CornerRadius="12" Padding="12" BackgroundColor="#E3F2FD">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="饮食健康分析" FontAttributes="Bold" FontSize="18" />
+                    
+                    <!-- 获取饮食健康分析按钮 -->
+                    <Button x:Name="GetDietAnalysisButton"
+                            Text="获取饮食健康分析"
+                            BackgroundColor="#2196F3"
+                            TextColor="White"
+                            CornerRadius="8"
+                            Clicked="OnGetDietAnalysisClicked"
+                            IsVisible="{Binding ShowGetDietAnalysisButton}"/>
+                    
+                    <!-- 加载指示器 -->
+                    <StackLayout Orientation="Horizontal" 
+                                Spacing="10" 
+                                HorizontalOptions="Center"
+                                IsVisible="{Binding IsLoadingDietAnalysis}">
+                        <ActivityIndicator IsRunning="{Binding IsLoadingDietAnalysis}" 
+                                         Color="#2196F3"/>
+                        <Label Text="正在分析饮食健康..." 
+                               FontSize="14" 
+                               VerticalOptions="Center"/>
+                    </StackLayout>
+                    
+                    <!-- 饮食健康分析内容 -->
+                    <Label Text="{Binding DietHealthAdvice}" 
+                           FontSize="16" 
+                           LineBreakMode="WordWrap"
+                           IsVisible="{Binding ShowDietHealthAdvice}"/>
+                </VerticalStackLayout>
+            </Frame>
+
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

@@ -57,5 +57,47 @@ namespace LLMLib
                 }
             }
         }
+
+        /// <summary>
+        /// 分析用户详细饮食健康状况
+        /// </summary>
+        public async Task<string> AnalyzeDietHealthAsync(string detailedMealData)
+        {
+            var messages = new List<ChatMessage>
+                {
+                    new SystemChatMessage(ChatMessageContentPart.CreateTextPart("你是一位专业的营养师，擅长分析用户的饮食健康状况。请根据以下详细的饮食数据，分析用户的营养摄入情况并给出健康建议。\r\n数据格式为JSON，包含每餐的类型、日期、时间、具体食物名称和食物标签。请分析以下方面：\r\n1. 营养均衡性分析（蛋白质、碳水化合物、维生素、纤维等）\r\n2. 食物多样性评估\r\n3. 不健康食物摄入情况\r\n4. 针对性的饮食改善建议\r\n请给出实用的建议，总字数控制在600字以内。开头为\"根据您的详细饮食数据分析，以下是营养健康建议：\"，输出完建议后停止输出。")),
+                    new UserChatMessage(ChatMessageContentPart.CreateTextPart($"请分析以下详细饮食数据并提供健康建议：{detailedMealData}"))
+                };
+
+            ChatCompletion completion = await _chatClient.CompleteChatAsync(messages);
+
+            return completion.Content[0].Text;
+        }
+
+        /// <summary>
+        /// 流式分析用户详细饮食健康状况
+        /// </summary>
+        public async Task AnalyzeDietHealthStreamAsync(string detailedMealData, Action<string> onContentReceived)
+        {
+            var messages = new List<ChatMessage>
+                {
+                    new SystemChatMessage(ChatMessageContentPart.CreateTextPart("你是一位专业的营养师，擅长分析用户的饮食健康状况。请根据以下详细的饮食数据，分析用户的营养摄入情况并给出健康建议。\r\n数据格式为JSON，包含每餐的类型、日期、时间、具体食物名称和食物标签。请分析以下方面：\r\n1. 营养均衡性分析（蛋白质、碳水化合物、维生素、纤维等）\r\n2. 食物多样性评估\r\n3. 不健康食物摄入情况\r\n4. 针对性的饮食改善建议\r\n请给出实用的建议，总字数控制在600字以内。开头为\"根据您的详细饮食数据分析，以下是营养健康建议：\"，输出完建议后停止输出。")),
+                    new UserChatMessage(ChatMessageContentPart.CreateTextPart($"请分析以下详细饮食数据并提供健康建议：{detailedMealData}"))
+                };
+
+            await foreach (StreamingChatCompletionUpdate update in _chatClient.CompleteChatStreamingAsync(messages))
+            {
+                if (update.ContentUpdate != null && update.ContentUpdate.Count > 0)
+                {
+                    foreach (var contentPart in update.ContentUpdate)
+                    {
+                        if (contentPart.Text != null)
+                        {
+                            onContentReceived?.Invoke(contentPart.Text);
+                        }
+                    }
+                }
+            }
+        }
     }
 }

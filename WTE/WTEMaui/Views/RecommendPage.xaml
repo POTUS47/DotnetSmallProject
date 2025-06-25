@@ -17,7 +17,7 @@
                     BackgroundColor="Transparent"
                     TextColor="#512BD4"
                     FontSize="20"
-                    WidthRequest="40"
+                    WidthRequest="80"
                     HeightRequest="40"
                     Clicked="OnSettingsClicked"/>
         </Grid>

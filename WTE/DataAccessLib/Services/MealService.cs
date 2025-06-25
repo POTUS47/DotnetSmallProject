@@ -184,6 +184,144 @@ namespace DataAccessLib.Services
         #region 餐食查询
 
         /// <summary>
+        /// 获取用户详细饮食数据JSON（包含食物名称和标签）
+        /// </summary>
+        public async Task<string> GetUserDetailedMealsJsonAsync(int userId, int dayCount = 30)
+        {
+            try
+            {
+                _logger?.LogInformation("正在查询用户 {UserId} 的详细饮食记录", userId);
+
+                var startDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-dayCount));
+                var endDate = DateOnly.FromDateTime(DateTime.Today);
+
+                // 分步骤查询以避免复杂的 LINQ 翻译问题
+                // 1. 先获取基本的餐食数据
+                var meals = await _context.Meals
+                    .Where(m => m.UserId == userId && m.MealDate >= startDate && m.MealDate <= endDate)
+                    .OrderByDescending(m => m.MealDate)
+                    .ThenBy(m => m.MealTime)
+                    .ToListAsync();
+
+                var mealsData = new List<object>();
+
+                // 2. 为每个餐食单独查询食物和标签信息
+                foreach (var meal in meals)
+                {
+                    // 获取该餐食的食物信息
+                    var mealFoods = await _context.MealFoodImages
+                        .Where(mfi => mfi.MealId == meal.MealId)
+                        .Include(mfi => mfi.Food)
+                        .ToListAsync();
+
+                    var foods = new List<object>();
+
+                    foreach (var mealFood in mealFoods)
+                    {
+                        // 获取该食物的标签
+                        var tags = await _context.MealFoodTags
+                            .Where(mft => mft.MealId == meal.MealId && mft.FoodId == mealFood.FoodId)
+                            .Include(mft => mft.Tag)
+                            .Select(mft => mft.Tag.TagName)
+                            .ToListAsync();
+
+                        foods.Add(new
+                        {
+                            FoodName = mealFood.Food.Name,
+                            Tags = tags
+                        });
+                    }
+
+                    mealsData.Add(new
+                    {
+                        MealType = meal.MealType,
+                        MealDate = meal.MealDate,
+                        MealTime = meal.MealTime.ToString(@"hh\:mm"),
+                        Foods = foods
+                    });
+                }
+
+                // 序列化为JSON
+                return JsonSerializer.Serialize(mealsData, new JsonSerializerOptions
+                {
+                    WriteIndented = true,
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "查询详细饮食记录失败");
+                throw new Exception("获取详细饮食数据失败，请检查网络连接", ex);
+            }
+        }
+
+        /// <summary>
+        /// 获取用户详细饮食数据JSON（优化版本）
+        /// </summary>
+        public async Task<string> GetUserDetailedMealsJsonOptimizedAsync(int userId, int dayCount = 30)
+        {
+            try
+            {
+                _logger?.LogInformation("正在查询用户 {UserId} 的详细饮食记录（优化版本）", userId);
+
+                var startDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-dayCount));
+                var endDate = DateOnly.FromDateTime(DateTime.Today);
+
+                // 1. 获取基本餐食数据
+                var meals = await _context.Meals
+                    .Where(m => m.UserId == userId && m.MealDate >= startDate && m.MealDate <= endDate)
+                    .OrderByDescending(m => m.MealDate)
+                    .ThenBy(m => m.MealTime)
+                    .ToListAsync();
+
+                var mealIds = meals.Select(m => m.MealId).ToList();
+
+                // 2. 批量获取所有相关的食物信息
+                var allMealFoods = await _context.MealFoodImages
+                    .Where(mfi => mealIds.Contains(mfi.MealId))
+                    .Include(mfi => mfi.Food)
+                    .ToListAsync();
+
+                // 3. 批量获取所有相关的标签信息
+                var allMealTags = await _context.MealFoodTags
+                    .Where(mft => mealIds.Contains(mft.MealId))
+                    .Include(mft => mft.Tag)
+                    .ToListAsync();
+
+                // 4. 在内存中组装数据
+                var mealsData = meals.Select(meal => new
+                {
+                    MealType = meal.MealType,
+                    MealDate = meal.MealDate,
+                    MealTime = meal.MealTime.ToString(@"hh\:mm"),
+                    Foods = allMealFoods
+                        .Where(mfi => mfi.MealId == meal.MealId)
+                        .Select(mfi => new
+                        {
+                            FoodName = mfi.Food.Name,
+                            Tags = allMealTags
+                                .Where(mft => mft.MealId == meal.MealId && mft.FoodId == mfi.FoodId)
+                                .Select(mft => mft.Tag.TagName)
+                                .ToList()
+                        })
+                        .ToList()
+                }).ToList();
+
+                // 序列化为JSON
+                return JsonSerializer.Serialize(mealsData, new JsonSerializerOptions
+                {
+                    WriteIndented = true,
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "查询详细饮食记录失败（优化版本）");
+                throw new Exception("获取详细饮食数据失败，请检查网络连接", ex);
+            }
+        }
+
+        /// <summary>
         /// 获取当前用户的饮食记录JSON
         /// </summary>
         public async Task<string> GetUserMealsJsonAsync(int userId)
