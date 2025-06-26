@@ -24,27 +24,38 @@ namespace LLMLib
         /// <summary>
         /// 基于用户历史饮食数据推荐健康食物
         /// </summary>
-        public async Task<string> RecommendHealthyFoodAsync(string userHistoryData)
+        public async Task<string> RecommendHealthyFoodAsync(string userHistoryData, string userTarget = "暂无", string userAllergies = "无过敏原")
         {
-            var messages = new List<ChatMessage>
-            {
-                new SystemChatMessage(ChatMessageContentPart.CreateTextPart(@"你是一位专业的营养师和美食推荐专家。请根据用户的历史饮食数据，推荐一种健康的食物。
+            var systemPrompt = @"你是一位专业的营养师和美食推荐专家。请根据用户的历史饮食数据、健康目标和过敏信息，推荐一种健康的食物。
 
 要求：
 1. 分析用户已经吃过的食物，尽量推荐用户没吃过但可能感兴趣的健康食物
 2. 考虑营养均衡，补充用户饮食中可能缺失的营养成分
 3. 食物要具有健康价值，如富含维生素、纤维、优质蛋白质等
-4. 输出格式必须严格按照以下JSON格式：
+4. 根据用户的健康目标进行针对性推荐（如减重、增肌、维持健康等）
+5. 严格避免用户的过敏原，确保食物安全
+6. 输出格式必须严格按照以下JSON格式：
 {
   ""foodName"": ""食物名称"",
-  ""reason"": ""推荐理由（20字以内，说明为什么健康和对人体的好处）""
+  ""reason"": ""推荐理由（50字以内，说明为什么健康、对用户健康目标的帮助以及营养价值）""
 }
 
 注意：
 - 只输出一个JSON对象，不要有其他内容
-- 推荐理由要简洁明了，重点突出健康价值
-- 食物名称要具体，如""蒸蛋羹""而不是""蛋类""")),
-                new UserChatMessage(ChatMessageContentPart.CreateTextPart($"用户历史饮食数据：{userHistoryData}"))
+- 推荐理由要简洁明了，重点突出健康价值和对用户目标的帮助
+- 食物名称要具体，如""蒸蛋羹""而不是""蛋类""
+- 如果用户有过敏原，绝对不能推荐含有该过敏原的食物
+- 如果用户健康目标明确，要优先推荐有助于实现该目标的食物";
+
+            var messages = new List<ChatMessage>
+            {
+                new SystemChatMessage(ChatMessageContentPart.CreateTextPart(systemPrompt)),
+                new UserChatMessage(ChatMessageContentPart.CreateTextPart($@"用户信息：
+健康目标：{userTarget}
+过敏原：{userAllergies}
+历史饮食数据：{userHistoryData}
+
+请基于以上信息为用户推荐一种健康食物。"))
             };
 
             try
@@ -156,27 +167,38 @@ namespace LLMLib
         /// <summary>
         /// 流式推荐健康食物
         /// </summary>
-        public async Task RecommendHealthyFoodStreamAsync(string userHistoryData, Action<string> onContentReceived)
+        public async Task RecommendHealthyFoodStreamAsync(string userHistoryData, Action<string> onContentReceived, string userTarget = "暂无", string userAllergies = "无过敏原")
         {
-            var messages = new List<ChatMessage>
-            {
-                new SystemChatMessage(ChatMessageContentPart.CreateTextPart(@"你是一位专业的营养师和美食推荐专家。请根据用户的历史饮食数据，推荐一种健康的食物。
+            var systemPrompt = @"你是一位专业的营养师和美食推荐专家。请根据用户的历史饮食数据、健康目标和过敏信息，推荐一种健康的食物。
 
 要求：
 1. 分析用户已经吃过的食物，尽量推荐用户没吃过但可能感兴趣的健康食物
 2. 考虑营养均衡，补充用户饮食中可能缺失的营养成分
 3. 食物要具有健康价值，如富含维生素、纤维、优质蛋白质等
-4. 输出格式必须严格按照以下JSON格式：
+4. 根据用户的健康目标进行针对性推荐（如减重、增肌、维持健康等）
+5. 严格避免用户的过敏原，确保食物安全
+6. 输出格式必须严格按照以下JSON格式：
 {
   ""foodName"": ""食物名称"",
-  ""reason"": ""推荐理由（20字以内，说明为什么健康和对人体的好处）""
+  ""reason"": ""推荐理由（30字以内，说明为什么健康、对用户健康目标的帮助以及营养价值）""
 }
 
 注意：
 - 只输出一个JSON对象，不要有其他内容
-- 推荐理由要简洁明了，重点突出健康价值
-- 食物名称要具体，如""蒸蛋羹""而不是""蛋类""")),
-                new UserChatMessage(ChatMessageContentPart.CreateTextPart($"用户历史饮食数据：{userHistoryData}"))
+- 推荐理由要简洁明了，重点突出健康价值和对用户目标的帮助
+- 食物名称要具体，如""蒸蛋羹""而不是""蛋类""
+- 如果用户有过敏原，绝对不能推荐含有该过敏原的食物
+- 如果用户健康目标明确，要优先推荐有助于实现该目标的食物";
+
+            var messages = new List<ChatMessage>
+            {
+                new SystemChatMessage(ChatMessageContentPart.CreateTextPart(systemPrompt)),
+                new UserChatMessage(ChatMessageContentPart.CreateTextPart($@"用户信息：
+健康目标：{userTarget}
+过敏原：{userAllergies}
+历史饮食数据：{userHistoryData}
+
+请基于以上信息为用户推荐一种健康食物。"))
             };
 
             try

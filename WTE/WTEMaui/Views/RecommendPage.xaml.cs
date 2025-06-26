@@ -27,6 +27,8 @@ namespace WTEMaui.Views
         public bool HasResult { get; set; } = false;
         public bool IsAnimating { get; set; } = false;
         private readonly int _userId;
+        private readonly string _userTarget;
+        private readonly string _userAllergies;
 
         public RecommendPage(FoodService foodService, MealService mealService, FoodRecommendationService foodRecommendationService)
         {
@@ -36,10 +38,15 @@ namespace WTEMaui.Views
             _mealService = mealService;
             _foodRecommendationService = foodRecommendationService;
             _userId = App.CurrentUser?.UserId ?? 1;
+            _userTarget = App.CurrentUser?.HealthGoal ?? "暂无";
+            _userAllergies = App.CurrentUser?.Allergies ?? "无过敏原";
         }
 
         private async void OnRandomClicked(object sender, EventArgs e)
         {
+            // 立即清空之前的结果
+            ClearRecommendationResults();
+            
             // 开始动画
             await StartLoadingAnimation();
             
@@ -47,11 +54,6 @@ namespace WTEMaui.Views
             string result = "";
             string status = "";
             bool success = false;
-            
-            // 重置所有结果
-            RecommendResult = string.Empty;
-            RecommendFoodName = string.Empty;
-            RecommendReason = string.Empty;
 
             try
             {
@@ -107,9 +109,6 @@ namespace WTEMaui.Views
             }
             else
             {
-                RecommendFoodName = string.Empty;
-                RecommendReason = string.Empty;
-                RecommendResult = string.Empty;
                 StatusMsg = status;
                 HasResult = false;
                 OnPropertyChanged(nameof(HasResult));
@@ -117,12 +116,14 @@ namespace WTEMaui.Views
 
             OnPropertyChanged(nameof(RecommendFoodName));
             OnPropertyChanged(nameof(RecommendReason));
-            OnPropertyChanged(nameof(RecommendResult));
             OnPropertyChanged(nameof(StatusMsg));
         }
 
         private async void OnHealthyClicked(object sender, EventArgs e)
         {
+            // 立即清空之前的结果
+            ClearRecommendationResults();
+            
             // 开始动画
             await StartLoadingAnimation();
             
@@ -131,11 +132,6 @@ namespace WTEMaui.Views
             string reason = "";
             string status = "";
             bool success = false;
-            
-            // 重置结果
-            RecommendResult = string.Empty;
-            RecommendFoodName = string.Empty;
-            RecommendReason = string.Empty;
 
             try
             {
@@ -148,10 +144,15 @@ namespace WTEMaui.Views
                 }
                 else
                 {
-                    // 2. 调用LLM服务获取健康推荐
-                    var recommendationResult = await _foodRecommendationService.RecommendHealthyFoodAsync(userMealData);
+                    // 2. 调用LLM服务获取健康推荐，传递用户健康目标和过敏原
+                    var recommendationResult = await _foodRecommendationService.RecommendHealthyFoodAsync(
+                        userMealData, 
+                        _userTarget, 
+                        _userAllergies);
                     
                     System.Diagnostics.Debug.WriteLine($"LLM推荐结果: {recommendationResult}");
+                    System.Diagnostics.Debug.WriteLine($"用户健康目标: {_userTarget}");
+                    System.Diagnostics.Debug.WriteLine($"用户过敏原: {_userAllergies}");
                     
                     // 3. 解析推荐结果
                     var parts = recommendationResult.Split('|', StringSplitOptions.RemoveEmptyEntries);
@@ -165,7 +166,7 @@ namespace WTEMaui.Views
                     else if (parts.Length == 1)
                     {
                         foodName = parts[0].Trim();
-                        reason = "营养均衡，有益健康";
+                        reason = "营养均衡，符合您的健康目标";
                         success = true;
                         System.Diagnostics.Debug.WriteLine($"部分解析成功 - 菜名: {foodName}");
                     }
@@ -202,8 +203,6 @@ namespace WTEMaui.Views
             }
             else
             {
-                RecommendFoodName = string.Empty;
-                RecommendReason = string.Empty;
                 StatusMsg = status;
                 HasResult = false;
                 OnPropertyChanged(nameof(HasResult));
@@ -212,6 +211,25 @@ namespace WTEMaui.Views
             OnPropertyChanged(nameof(RecommendFoodName));
             OnPropertyChanged(nameof(RecommendReason));
             OnPropertyChanged(nameof(StatusMsg));
+        }
+
+        /// <summary>
+        /// 清空推荐结果
+        /// </summary>
+        private void ClearRecommendationResults()
+        {
+            RecommendResult = string.Empty;
+            RecommendFoodName = string.Empty;
+            RecommendReason = string.Empty;
+            StatusMsg = string.Empty;
+            HasResult = false;
+
+            // 立即通知UI更新
+            OnPropertyChanged(nameof(RecommendResult));
+            OnPropertyChanged(nameof(RecommendFoodName));
+            OnPropertyChanged(nameof(RecommendReason));
+            OnPropertyChanged(nameof(StatusMsg));
+            OnPropertyChanged(nameof(HasResult));
         }
 
         private async Task StartLoadingAnimation()
