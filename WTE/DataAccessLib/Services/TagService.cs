@@ -2,6 +2,9 @@ using DataAccessLib.Data;
 using DataAccessLib.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DataAccessLib.Services
 {
@@ -150,6 +153,45 @@ namespace DataAccessLib.Services
             {
                 _logger?.LogError(ex, "获取用户历史标签失败: UserId={UserId}", userId);
                 throw new Exception($"获取历史标签失败: {ex.Message}");
+            }
+        }
+
+        public List<(int TagId, string TagName, int Count)> GetUserTagStatistics(int userId, DateTime fromDateTime, DateTime toDateTime)
+        {
+            try
+            {
+                Console.WriteLine($"查询标签统计 - 用户ID: {userId}, 开始日期: {fromDateTime:yyyy-MM-dd}, 结束日期: {toDateTime:yyyy-MM-dd}");
+                
+                var fromDate = DateOnly.FromDateTime(fromDateTime);
+                var toDate = DateOnly.FromDateTime(toDateTime);
+
+                var result = _context.MealFoodTags
+                    .Include(m => m.Meal)
+                    .Include(m => m.Tag)
+                    .Where(m => m.Meal.UserId == userId &&
+                           m.Meal.MealDate >= fromDate &&
+                           m.Meal.MealDate <= toDate)
+                    .GroupBy(m => new { m.TagId, m.Tag.TagName })
+                    .Select(g => new
+                    {
+                        TagId = g.Key.TagId,
+                        TagName = g.Key.TagName,
+                        Count = g.Count()
+                    })
+                    .ToList();
+
+                Console.WriteLine($"查询到 {result.Count} 个标签统计结果");
+                foreach (var item in result)
+                {
+                    Console.WriteLine($"标签: {item.TagName}, ID: {item.TagId}, 数量: {item.Count}");
+                }
+
+                return result.Select(r => (r.TagId, r.TagName, r.Count)).ToList();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"获取标签统计时出错: {ex}");
+                throw;
             }
         }
     }

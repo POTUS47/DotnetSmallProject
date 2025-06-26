@@ -64,6 +64,7 @@
 		<PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
 		<PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.8" />
 		<PackageReference Include="Syncfusion.Maui.Calendar" Version="29.2.11" />
+		<PackageReference Include="Syncfusion.Maui.Charts" Version="30.1.37" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -84,6 +85,17 @@
 	  <MauiXaml Update="Views\RecommendPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="..\x64\Debug\CalculateTagLib.dll">
+			<Link>CalculateTagLib.dll</Link>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="..\x64\Debug\CalculateTagLib.dll">
+			<Link>native\CalculateTagLib.dll</Link>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
 	</ItemGroup>
 
 </Project>
