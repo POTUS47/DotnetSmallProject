@@ -32,24 +32,112 @@
                 Clicked="OnHealthyClicked"
                 FontSize="20" />
 
+		<!-- 动画加载区域 -->
+		<Grid x:Name="AnimationContainer" 
+              IsVisible="{Binding IsAnimating}"
+              HeightRequest="300">
+			
+			<!-- 背景渐变 -->
+			<Frame CornerRadius="20"
+                   HasShadow="True"
+                   Padding="0"
+                   BackgroundColor="Transparent">
+				<Frame.Background>
+					<LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+						<GradientStop Color="#FFE6F3FF" Offset="0.0" />
+						<GradientStop Color="#FFCCE7FF" Offset="0.5" />
+						<GradientStop Color="#FFB3DAFF" Offset="1.0" />
+					</LinearGradientBrush>
+				</Frame.Background>
+				
+				<Grid>
+					<!-- 旋转的美食图标 -->
+					<Label x:Name="FoodIcon"
+                           Text="🍽️"
+                           FontSize="80"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           Opacity="0.8" />
+					
+					<!-- 外圈旋转动画 -->
+					<Ellipse x:Name="OuterRing"
+                             Stroke="#512BD4"
+                             StrokeThickness="4"
+                             WidthRequest="120"
+                             HeightRequest="120"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"
+                             Opacity="0.6" />
+					
+					<!-- 内圈旋转动画 -->
+					<Ellipse x:Name="InnerRing"
+                             Stroke="#FF6B6B"
+                             StrokeThickness="2"
+                             WidthRequest="80"
+                             HeightRequest="80"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"
+                             Opacity="0.4" />
+					
+					<!-- 加载文字 -->
+					<Label x:Name="LoadingText"
+                           Text="🔮 正在为您寻找美味..."
+                           FontSize="16"
+                           HorizontalOptions="Center"
+                           VerticalOptions="End"
+                           Margin="0,0,0,40"
+                           TextColor="#512BD4" />
+				</Grid>
+			</Frame>
+		</Grid>
+
 		<!-- 推荐结果展示 -->
-		<Frame CornerRadius="12"
-               Padding="16"
-               BackgroundColor="#F5F5F5"
-               IsVisible="{Binding HasResult}">
-			<VerticalStackLayout>
-				<Label Text="今日推荐："
-                       FontAttributes="Bold"
-                       FontSize="18" />
-				<Label Text="{Binding RecommendResult}"
-                       FontSize="24"
-                       TextColor="#512BD4" />
-			</VerticalStackLayout>
-		</Frame>
+		<Grid x:Name="ResultContainer" IsVisible="{Binding HasResult}">
+			<Frame CornerRadius="16"
+                   Padding="20"
+                   HasShadow="True"
+                   BackgroundColor="White"
+                   BorderColor="#512BD4"
+                   x:Name="ResultFrame">
+				<VerticalStackLayout>
+					<!-- 庆祝动画 -->
+					<Label x:Name="CelebrationIcon"
+                           Text="🎉"
+                           FontSize="40"
+                           HorizontalOptions="Center"
+                           Opacity="0" />
+					
+					<Label Text="✨ 今日推荐 ✨"
+                           FontAttributes="Bold"
+                           FontSize="20"
+                           HorizontalOptions="Center"
+                           TextColor="#512BD4"
+                           Margin="0,10,0,5" />
+					
+					<Label x:Name="RecommendResultLabel"
+                           Text="{Binding RecommendResult}"
+                           FontSize="32"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"
+                           TextColor="#FF6B6B"
+                           Margin="0,5,0,10" />
+					
+					<!-- 装饰性元素 -->
+					<StackLayout Orientation="Horizontal" 
+                                 HorizontalOptions="Center"
+                                 Spacing="10">
+						<Label Text="⭐" FontSize="20" x:Name="Star1" Opacity="0" />
+						<Label Text="⭐" FontSize="20" x:Name="Star2" Opacity="0" />
+						<Label Text="⭐" FontSize="20" x:Name="Star3" Opacity="0" />
+					</StackLayout>
+				</VerticalStackLayout>
+			</Frame>
+		</Grid>
 
 		<!-- 状态信息 -->
 		<Label Text="{Binding StatusMsg}"
                FontSize="16"
-               TextColor="Gray" />
+               TextColor="Gray"
+               HorizontalOptions="Center" />
 	</VerticalStackLayout>
 </ContentPage>
