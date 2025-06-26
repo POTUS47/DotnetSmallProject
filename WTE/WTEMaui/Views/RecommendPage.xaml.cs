@@ -81,25 +81,7 @@ namespace WTEMaui.Views
             }
             catch (HttpRequestException ex)
             {
-                // 网络错误时从历史食物列表中随机选择
-                var userHistoryFoods = await _foodService.GetUserHistoryFoodsAsync(_userId, 20);
-                var foodNames = userHistoryFoods.Select(f => f.Name).ToList();
-                
-                if (!foodNames.Any())
-                {
-                    foodNames = _defaultFoods;
-                }
-                
-                if (foodNames.Any())
-                {
-                    var random = new Random();
-                    result = foodNames[random.Next(foodNames.Count)];
-                    success = true;
-                }
-                else
-                {
-                    status = $"网络错误：{ex.Message}";
-                }
+                status = $"网络错误：{ex.Message}";
             }
             catch (Exception ex)
             {

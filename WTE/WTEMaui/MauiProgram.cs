@@ -18,7 +18,6 @@ namespace WTEMaui
             Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("YOUR_LICENSE_KEY");  // 如果你有许可证密钥的话
 
             var builder = MauiApp.CreateBuilder();
-#pragma warning disable MCT001 // `.UseMauiCommunityToolkit()` Not Found on MauiAppBuilder
             builder
                 .UseMauiApp<App>()
                 .ConfigureFonts(fonts =>
@@ -27,7 +26,6 @@ namespace WTEMaui
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 })
                 .ConfigureSyncfusionCore();
-#pragma warning restore MCT001 // `.UseMauiCommunityToolkit()` Not Found on MauiAppBuilder
 
             // 在 MauiProgram.cs 或 Program.cs 中
             builder.Services.AddDbContext<AppDbContext>(options =>
