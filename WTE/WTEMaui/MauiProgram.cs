@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using WTEMaui.Views;
 using Syncfusion.Maui.Core.Hosting;
+using WTEMaui.Services;
 
 namespace WTEMaui
 {
@@ -14,6 +15,8 @@ namespace WTEMaui
     {
         public static MauiApp CreateMauiApp()
         {
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("YOUR_LICENSE_KEY");  // 如果你有许可证密钥的话
+
             var builder = MauiApp.CreateBuilder();
 #pragma warning disable MCT001 // `.UseMauiCommunityToolkit()` Not Found on MauiAppBuilder
             builder
@@ -60,6 +63,8 @@ namespace WTEMaui
             builder.Services.AddScoped<AnalysisService>();
             builder.Services.AddScoped<RecommendService>();
             
+            builder.Services.AddSingleton<TagStatisticsService>();
+
             builder.Services.AddTransient<DashboardPage>(serviceProvider =>
             new DashboardPage(
                 serviceProvider.GetRequiredService<ImageRecognitionService>(),
@@ -77,7 +82,9 @@ namespace WTEMaui
             new AnalysisPage(
                 serviceProvider.GetRequiredService<HealthAnalysisService>(),
                 serviceProvider.GetRequiredService<MealService>(),
-                serviceProvider.GetRequiredService<AnalysisService>()));
+                serviceProvider.GetRequiredService<AnalysisService>(),
+                serviceProvider.GetRequiredService<TagStatisticsService>()
+            ));
             builder.Services.AddTransient<SettingsPage>();
             builder.Services.AddTransient<RecommendPage>(serviceProvider =>
             new RecommendPage(

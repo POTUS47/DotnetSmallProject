@@ -8,6 +8,8 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using WTEMaui.Services;
+using Syncfusion.Maui.Charts;
 
 namespace WTEMaui.Views
 {
@@ -108,19 +110,25 @@ namespace WTEMaui.Views
         private DateOnly _startDate;
         private DateOnly _endDate;
 
+        private readonly TagStatisticsService _tagStatisticsService;
 
-        public AnalysisPage(HealthAnalysisService healthAnalysisService,MealService mealService, AnalysisService analysisService)
+        public AnalysisPage(
+            HealthAnalysisService healthAnalysisService,
+            MealService mealService,
+            AnalysisService analysisService,
+            TagStatisticsService tagStatisticsService)
         {
             try
             {
                 InitializeComponent();
+                _healthAnalysisService = healthAnalysisService;
+                _mealService = mealService;
                 _analysisService = analysisService;
+                _tagStatisticsService = tagStatisticsService;
                 
                 _userId = App.CurrentUser?.UserId ?? 1; // 如果未登录，默认使用ID=1
                 UserName = App.CurrentUser?.Username ?? "未登录用户";
                 BindingContext = this;
-                _mealService = mealService;
-                _healthAnalysisService= healthAnalysisService;
                 FoodCalendar.Identifier = CalendarIdentifier.Gregorian;
 
                 _startDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-30));
@@ -325,6 +333,170 @@ namespace WTEMaui.Views
             }
         }
 
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            LoadTagStatistics();
+        }
+
+        private void LoadTagStatistics()
+        {
+            try
+            {
+                var startDate = _startDate.ToDateTime(TimeOnly.MinValue);
+                var endDate = _endDate.ToDateTime(TimeOnly.MinValue);
+                var stats = _tagStatisticsService.GetUserTagStatistics(_userId, startDate, endDate);
+                
+                if (stats != null && stats.Any())
+                {
+                    var chartData = stats.Select(s => new TagStatisticData
+                    {
+                        TagName = s.TagName,
+                        Percentage = s.Percentage * 100
+                    }).ToList();
+
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        pieSeries.ItemsSource = chartData;
+                    });
+                }
+                else
+                {
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        await DisplayAlert("提示", "当前时间段没有标签数据", "确定");
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    if (ex is FileNotFoundException)
+                    {
+                        await DisplayAlert("错误", "找不到必要的DLL文件，请确保应用程序完整性", "确定");
+                    }
+                    else if (ex is DllNotFoundException)
+                    {
+                        await DisplayAlert("错误", "无法加载必要的DLL文件，请确保应用程序完整性", "确定");
+                    }
+                    else
+                    {
+                        await DisplayAlert("错误", $"加载标签统计数据失败: {ex.Message}", "确定");
+                    }
+                    System.Diagnostics.Debug.WriteLine($"LoadTagStatistics error: {ex}");
+                });
+            }
+        }
+
+        private void UpdateChartData(DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                var stats = _tagStatisticsService.GetUserTagStatistics(_userId, startDate, endDate);
+                
+                if (stats != null)
+                {
+                    if (stats.Any())
+                    {
+                        var chartData = stats.Select(s => new TagStatisticData
+                        {
+                            TagName = $"{s.TagName} ({s.Count})",
+                            Percentage = s.Percentage
+                        }).ToList();
+
+                        MainThread.BeginInvokeOnMainThread(() =>
+                        {
+                            try
+                            {
+                                if (pieSeries != null)
+                                {
+                                    pieSeries.ItemsSource = null;
+                                    pieSeries.ItemsSource = chartData;
+                                }
+                                else
+                                {
+                                    DisplayAlert("错误", "pieSeries 为 null", "确定");
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                DisplayAlert("错误", $"更新图表数据源时出错: {ex.Message}", "确定");
+                            }
+                        });
+                    }
+                    else
+                    {
+                        MainThread.BeginInvokeOnMainThread(async () =>
+                        {
+                            await DisplayAlert("提示", 
+                                $"当前时间段（{startDate:yyyy-MM-dd} 至 {endDate:yyyy-MM-dd}）没有标签数据", 
+                                "确定");
+                        });
+                    }
+                }
+                else
+                {
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        await DisplayAlert("提示", 
+                            $"GetUserTagStatistics 返回了 null", 
+                            "确定");
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    await DisplayAlert("错误", 
+                        $"更新图表数据失败: {ex.Message}\n\n{ex.StackTrace}", 
+                        "确定");
+                });
+            }
+        }
+
+        private void OnWeeklyStatsClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                // 获取本周一作为开始日期
+                var today = DateTime.Today;
+                var monday = today.AddDays(-(int)today.DayOfWeek + (int)DayOfWeek.Monday);
+                var sunday = monday.AddDays(6); // 周日
+                Console.WriteLine($"切换到周统计 - 从 {monday:yyyy-MM-dd} 到 {sunday:yyyy-MM-dd}");
+                UpdateChartData(monday, sunday);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"周统计出错: {ex}");
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    await DisplayAlert("错误", $"加载周统计数据失败: {ex.Message}", "确定");
+                });
+            }
+        }
+
+        private void OnMonthlyStatsClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                // 获取本月1号和最后一天
+                var firstDayOfMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+                var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+                Console.WriteLine($"切换到月统计 - 从 {firstDayOfMonth:yyyy-MM-dd} 到 {lastDayOfMonth:yyyy-MM-dd}");
+                UpdateChartData(firstDayOfMonth, lastDayOfMonth);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"月统计出错: {ex}");
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    await DisplayAlert("错误", $"加载月统计数据失败: {ex.Message}", "确定");
+                });
+            }
+        }
+
         public class DailyStatVM
         {
             public string Date { get; set; }
@@ -332,5 +504,11 @@ namespace WTEMaui.Views
             public double TotalCalories { get; set; }
             public double TotalProtein { get; set; }
         }
+    }
+
+    public class TagStatisticData
+    {
+        public string TagName { get; set; } = "";
+        public double Percentage { get; set; }
     }
 }
