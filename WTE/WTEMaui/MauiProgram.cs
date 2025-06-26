@@ -18,7 +18,6 @@ namespace WTEMaui
             Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("YOUR_LICENSE_KEY");  // 如果你有许可证密钥的话
 
             var builder = MauiApp.CreateBuilder();
-#pragma warning disable MCT001 // `.UseMauiCommunityToolkit()` Not Found on MauiAppBuilder
             builder
                 .UseMauiApp<App>()
                 .ConfigureFonts(fonts =>
@@ -27,7 +26,6 @@ namespace WTEMaui
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 })
                 .ConfigureSyncfusionCore();
-#pragma warning restore MCT001 // `.UseMauiCommunityToolkit()` Not Found on MauiAppBuilder
 
             // 在 MauiProgram.cs 或 Program.cs 中
             builder.Services.AddDbContext<AppDbContext>(options =>
@@ -46,10 +44,6 @@ namespace WTEMaui
                 new HealthAnalysisService(
                     "sk-0ea4236a89b8411eb0044e4931423862", // 替换为你的API密钥
                     sp.GetService<ILogger<HealthAnalysisService>>()));
-            builder.Services.AddSingleton<FoodRecommendationService>(sp =>
-                new FoodRecommendationService(
-                    "sk-0ea4236a89b8411eb0044e4931423862", // 替换为你的API密钥
-                    sp.GetService<ILogger<FoodRecommendationService>>()));
             
             // 注册OSS服务
             builder.Services.AddSingleton<OssService>();
@@ -86,11 +80,6 @@ namespace WTEMaui
                 serviceProvider.GetRequiredService<TagStatisticsService>()
             ));
             builder.Services.AddTransient<SettingsPage>();
-            builder.Services.AddTransient<RecommendPage>(serviceProvider =>
-            new RecommendPage(
-                serviceProvider.GetRequiredService<FoodService>(),
-                serviceProvider.GetRequiredService<MealService>(),
-                serviceProvider.GetRequiredService<FoodRecommendationService>()));
 
 #if DEBUG
             builder.Logging.AddDebug();
