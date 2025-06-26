@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using DataAccessLib.Services;
+using LLMLib;
 
 namespace WTEMaui.Views
 {
@@ -14,20 +15,26 @@ namespace WTEMaui.Views
         private const string BaseUrl = "http://localhost:5001"; // Android 模拟器用 10.0.2.2
         private readonly List<string> _defaultFoods = new() { "饺子", "拉面", "盖饭", "火锅", "寿司" };
         private readonly FoodService _foodService;
+        private readonly MealService _mealService;
+        private readonly FoodRecommendationService _foodRecommendationService;
         private const int MinAnimationDuration = 3000; // 最少动画时间3秒
 
         // 绑定属性
         public string RecommendResult { get; set; } = string.Empty;
+        public string RecommendFoodName { get; set; } = string.Empty;
+        public string RecommendReason { get; set; } = string.Empty;
         public string StatusMsg { get; set; } = string.Empty;
         public bool HasResult { get; set; } = false;
         public bool IsAnimating { get; set; } = false;
         private readonly int _userId;
 
-        public RecommendPage(FoodService foodService)
+        public RecommendPage(FoodService foodService, MealService mealService, FoodRecommendationService foodRecommendationService)
         {
             InitializeComponent();
             BindingContext = this;
             _foodService = foodService;
+            _mealService = mealService;
+            _foodRecommendationService = foodRecommendationService;
             _userId = App.CurrentUser?.UserId ?? 1;
         }
 
@@ -40,7 +47,11 @@ namespace WTEMaui.Views
             string result = "";
             string status = "";
             bool success = false;
+            
+            // 重置所有结果
             RecommendResult = string.Empty;
+            RecommendFoodName = string.Empty;
+            RecommendReason = string.Empty;
 
             try
             {
@@ -88,19 +99,118 @@ namespace WTEMaui.Views
             // 更新结果
             if (success)
             {
-                RecommendResult = result;
+                // 随机推荐只显示菜名，不显示理由
+                RecommendFoodName = result.Trim();
+                RecommendReason = "今日随机推荐，换个口味试试看！";
                 StatusMsg = string.Empty;
                 await ShowResultAnimation();
             }
             else
             {
+                RecommendFoodName = string.Empty;
+                RecommendReason = string.Empty;
                 RecommendResult = string.Empty;
                 StatusMsg = status;
                 HasResult = false;
                 OnPropertyChanged(nameof(HasResult));
             }
 
+            OnPropertyChanged(nameof(RecommendFoodName));
+            OnPropertyChanged(nameof(RecommendReason));
             OnPropertyChanged(nameof(RecommendResult));
+            OnPropertyChanged(nameof(StatusMsg));
+        }
+
+        private async void OnHealthyClicked(object sender, EventArgs e)
+        {
+            // 开始动画
+            await StartLoadingAnimation();
+            
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            string foodName = "";
+            string reason = "";
+            string status = "";
+            bool success = false;
+            
+            // 重置结果
+            RecommendResult = string.Empty;
+            RecommendFoodName = string.Empty;
+            RecommendReason = string.Empty;
+
+            try
+            {
+                // 1. 获取用户详细饮食历史数据
+                var userMealData = await _mealService.GetUserDetailedMealsJsonOptimizedAsync(_userId, 30);
+                
+                if (string.IsNullOrEmpty(userMealData) || userMealData == "[]")
+                {
+                    status = "暂无饮食历史，无法提供个性化健康推荐";
+                }
+                else
+                {
+                    // 2. 调用LLM服务获取健康推荐
+                    var recommendationResult = await _foodRecommendationService.RecommendHealthyFoodAsync(userMealData);
+                    
+                    System.Diagnostics.Debug.WriteLine($"LLM推荐结果: {recommendationResult}");
+                    
+                    // 3. 解析推荐结果
+                    var parts = recommendationResult.Split('|', StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length >= 2)
+                    {
+                        foodName = parts[0].Trim();
+                        reason = parts[1].Trim();
+                        success = true;
+                        System.Diagnostics.Debug.WriteLine($"解析成功 - 菜名: {foodName}, 理由: {reason}");
+                    }
+                    else if (parts.Length == 1)
+                    {
+                        foodName = parts[0].Trim();
+                        reason = "营养均衡，有益健康";
+                        success = true;
+                        System.Diagnostics.Debug.WriteLine($"部分解析成功 - 菜名: {foodName}");
+                    }
+                    else
+                    {
+                        status = "推荐服务返回格式异常";
+                        System.Diagnostics.Debug.WriteLine($"解析失败 - 原始结果: {recommendationResult}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                status = $"健康推荐失败：{ex.Message}";
+                System.Diagnostics.Debug.WriteLine($"健康推荐异常: {ex}");
+            }
+
+            // 确保动画至少播放完整时间
+            var elapsed = stopwatch.ElapsedMilliseconds;
+            if (elapsed < MinAnimationDuration)
+            {
+                await Task.Delay(MinAnimationDuration - (int)elapsed);
+            }
+
+            // 停止加载动画
+            await StopLoadingAnimation();
+
+            // 更新结果
+            if (success)
+            {
+                RecommendFoodName = foodName;
+                RecommendReason = reason;
+                StatusMsg = string.Empty;
+                await ShowResultAnimation();
+            }
+            else
+            {
+                RecommendFoodName = string.Empty;
+                RecommendReason = string.Empty;
+                StatusMsg = status;
+                HasResult = false;
+                OnPropertyChanged(nameof(HasResult));
+            }
+
+            OnPropertyChanged(nameof(RecommendFoodName));
+            OnPropertyChanged(nameof(RecommendReason));
             OnPropertyChanged(nameof(StatusMsg));
         }
 
@@ -196,6 +306,12 @@ namespace WTEMaui.Views
             ResultContainer.Scale = 0.1;
             ResultContainer.Opacity = 0;
 
+            // 重置星星透明度
+            Star1.Opacity = 0;
+            Star2.Opacity = 0;
+            Star3.Opacity = 0;
+            CelebrationIcon.Opacity = 0;
+
             // 庆祝动画序列
             var celebrationTask = Task.Run(async () =>
             {
@@ -212,19 +328,23 @@ namespace WTEMaui.Views
                     await CelebrationIcon.ScaleTo(1.5, 200);
                     await CelebrationIcon.ScaleTo(1.0, 200);
 
-                    // 3. 结果文字特效
-                    RecommendResultLabel.Scale = 0.5;
-                    await RecommendResultLabel.ScaleTo(1.2, 400, Easing.BounceOut);
-                    await RecommendResultLabel.ScaleTo(1.0, 200);
+                    // 3. 菜名特效
+                    RecommendFoodNameLabel.Scale = 0.5;
+                    await RecommendFoodNameLabel.ScaleTo(1.2, 400, Easing.BounceOut);
+                    await RecommendFoodNameLabel.ScaleTo(1.0, 200);
 
-                    // 4. 星星依次出现
+                    // 4. 推荐理由渐入
+                    RecommendReasonLabel.Opacity = 0;
+                    await RecommendReasonLabel.FadeTo(1.0, 500);
+
+                    // 5. 星星依次出现
                     await Star1.FadeTo(1.0, 200);
                     await Task.Delay(100);
                     await Star2.FadeTo(1.0, 200);
                     await Task.Delay(100);
                     await Star3.FadeTo(1.0, 200);
 
-                    // 5. 整体框架闪烁效果
+                    // 6. 整体框架闪烁效果
                     for (int i = 0; i < 2; i++)
                     {
                         ResultFrame.BackgroundColor = Color.FromArgb("#FFF0F8FF");
@@ -238,12 +358,12 @@ namespace WTEMaui.Views
             await celebrationTask;
         }
 
-        private void OnHealthyClicked(object sender, EventArgs e)
-        {
-            // 健康推荐逻辑（可根据需求实现）
-            StatusMsg = "健康推荐功能暂未实现";
-            OnPropertyChanged(nameof(StatusMsg));
-        }
+        // private void OnHealthyClicked(object sender, EventArgs e)
+        // {
+        //     // 健康推荐逻辑（可根据需求实现）
+        //     StatusMsg = "健康推荐功能暂未实现";
+        //     OnPropertyChanged(nameof(StatusMsg));
+        // }
 
         private async void OnSettingsClicked(object sender, EventArgs e)
         {
