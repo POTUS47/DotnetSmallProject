@@ -44,10 +44,6 @@ namespace WTEMaui
                 new HealthAnalysisService(
                     "sk-0ea4236a89b8411eb0044e4931423862", // 替换为你的API密钥
                     sp.GetService<ILogger<HealthAnalysisService>>()));
-            builder.Services.AddSingleton<FoodRecommendationService>(sp =>
-                new FoodRecommendationService(
-                    "sk-0ea4236a89b8411eb0044e4931423862", // 替换为你的API密钥
-                    sp.GetService<ILogger<FoodRecommendationService>>()));
             
             // 注册OSS服务
             builder.Services.AddSingleton<OssService>();
@@ -84,11 +80,6 @@ namespace WTEMaui
                 serviceProvider.GetRequiredService<TagStatisticsService>()
             ));
             builder.Services.AddTransient<SettingsPage>();
-            builder.Services.AddTransient<RecommendPage>(serviceProvider =>
-            new RecommendPage(
-                serviceProvider.GetRequiredService<FoodService>(),
-                serviceProvider.GetRequiredService<MealService>(),
-                serviceProvider.GetRequiredService<FoodRecommendationService>()));
 
 #if DEBUG
             builder.Logging.AddDebug();
