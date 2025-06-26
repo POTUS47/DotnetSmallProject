@@ -236,7 +236,7 @@ namespace DataAccessLib.Services
                     {
                         MealType = meal.MealType,
                         MealDate = meal.MealDate,
-                        MealTime = meal.MealTime.ToString(@"hh\:mm"),
+                        MealTime = meal.MealTime.ToString(@"HH\:mm"),
                         Foods = foods
                     });
                 }
@@ -293,7 +293,7 @@ namespace DataAccessLib.Services
                 {
                     MealType = meal.MealType,
                     MealDate = meal.MealDate,
-                    MealTime = meal.MealTime.ToString(@"hh\:mm"),
+                    MealTime = meal.MealTime.ToString(@"HH\:mm"),
                     Foods = allMealFoods
                         .Where(mfi => mfi.MealId == meal.MealId)
                         .Select(mfi => new
@@ -339,7 +339,7 @@ namespace DataAccessLib.Services
                     {
                         MealType = m.MealType.ToString(), // 转换枚举为字符串
                         m.MealDate,
-                        MealTime = m.MealTime.ToString(@"hh\:mm") // 格式化时间
+                        MealTime = m.MealTime.ToString(@"HH\:mm") // 格式化时间
                     })
                     .ToListAsync();
 

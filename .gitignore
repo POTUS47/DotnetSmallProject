@@ -56,3 +56,4 @@ nunit-*.xml
 /WTE/test
 WTE/DataAccessLib/Config/ossconfig.json
 WTE/DataAccessLib/Config/OssConfig.cs
+/FoodSelector/.vs
