@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:sf="clr-namespace:Syncfusion.Maui.Charts;assembly=Syncfusion.Maui.Charts"
+             x:Class="WTEMaui.Views.StatisticPage"
+             Title="统计">
+    <ScrollView>
+        <VerticalStackLayout Spacing="16" Padding="16">
+            <!-- 用户信息 -->
+            <Frame CornerRadius="12" Padding="8" BackgroundColor="#F5F5F5">
+                <Grid ColumnDefinitions="*,Auto">
+                    <HorizontalStackLayout Grid.Column="0" Spacing="12">
+                        <Image Source="dotnet_bot.png" WidthRequest="48" HeightRequest="48" />
+                        <Label Text="{Binding UserName}" FontSize="20" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                    
+                    <Button Grid.Column="1"
+                            Text="⚙️"
+                            BackgroundColor="Transparent"
+                            TextColor="#512BD4"
+                            FontSize="18"
+                            WidthRequest="80"
+                            HeightRequest="55"
+                            Clicked="OnSettingsClicked"/>
+                </Grid>
+            </Frame>
+
+            <!-- 统计类型选择 -->
+            <Frame CornerRadius="12" Padding="12" BackgroundColor="White">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="统计类型" FontAttributes="Bold" FontSize="16" />
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="8">
+                        <Button Grid.Row="0" Grid.Column="0"
+                                Text="食物统计"
+                                BackgroundColor="{Binding FoodStatColor}"
+                                TextColor="White"
+                                CornerRadius="8"
+                                Clicked="OnFoodStatClicked"/>
+                        <Button Grid.Row="0" Grid.Column="1"
+                                Text="标签统计"
+                                BackgroundColor="{Binding TagStatColor}"
+                                TextColor="White"
+                                CornerRadius="8"
+                                Clicked="OnTagStatClicked"/>
+                        <Button Grid.Row="1" Grid.Column="0"
+                                Text="每周统计"
+                                BackgroundColor="{Binding WeeklyStatColor}"
+                                TextColor="White"
+                                CornerRadius="8"
+                                Clicked="OnWeeklyStatClicked"/>
+                        <Button Grid.Row="1" Grid.Column="1"
+                                Text="每月统计"
+                                BackgroundColor="{Binding MonthlyStatColor}"
+                                TextColor="White"
+                                CornerRadius="8"
+                                Clicked="OnMonthlyStatClicked"/>
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- 日期范围选择 -->
+            <Frame CornerRadius="12" Padding="12" BackgroundColor="#F8F9FA">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="统计时间范围" FontAttributes="Bold" FontSize="16" />
+                    <Grid ColumnDefinitions="*,Auto,*" ColumnSpacing="12">
+                        <DatePicker Grid.Column="0" 
+                                   Date="{Binding StartDate}" 
+                                   Format="yyyy-MM-dd"/>
+                        <Label Grid.Column="1" Text="至" VerticalOptions="Center"/>
+                        <DatePicker Grid.Column="2" 
+                                   Date="{Binding EndDate}" 
+                                   Format="yyyy-MM-dd"/>
+                    </Grid>
+                    <Button Text="刷新数据"
+                            BackgroundColor="#007ACC"
+                            TextColor="White"
+                            CornerRadius="8"
+                            Clicked="OnRefreshDataClicked"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- 加载指示器 -->
+            <StackLayout Orientation="Horizontal" 
+                        Spacing="10" 
+                        HorizontalOptions="Center"
+                        IsVisible="{Binding IsLoading}">
+                <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                                 Color="#007ACC"/>
+                <Label Text="正在加载统计数据..." 
+                       FontSize="14" 
+                       VerticalOptions="Center"/>
+            </StackLayout>
+
+            <!-- 饼图统计 -->
+            <Frame CornerRadius="12" Padding="12" BackgroundColor="White" IsVisible="{Binding ShowPieChart}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="{Binding ChartTitle}" FontAttributes="Bold" FontSize="18" HorizontalOptions="Center" />
+                    <sf:SfCircularChart HeightRequest="300">
+                        <sf:SfCircularChart.Series>
+                            <sf:PieSeries ItemsSource="{Binding ChartData}"
+                                         XBindingPath="Name"
+                                         YBindingPath="Count"
+                                         ShowDataLabels="True"/>
+                        </sf:SfCircularChart.Series>
+                        <sf:SfCircularChart.Legend>
+                            <sf:ChartLegend Placement="Bottom"/>
+                        </sf:SfCircularChart.Legend>
+                    </sf:SfCircularChart>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- 柱状图统计 -->
+            <Frame CornerRadius="12" Padding="12" BackgroundColor="White" IsVisible="{Binding ShowColumnChart}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="{Binding ChartTitle}" FontAttributes="Bold" FontSize="18" HorizontalOptions="Center" />
+                    <sf:SfCartesianChart HeightRequest="300">
+                        <sf:SfCartesianChart.XAxes>
+                            <sf:CategoryAxis/>
+                        </sf:SfCartesianChart.XAxes>
+                        <sf:SfCartesianChart.YAxes>
+                            <sf:NumericalAxis/>
+                        </sf:SfCartesianChart.YAxes>
+                        <sf:SfCartesianChart.Series>
+                            <sf:ColumnSeries ItemsSource="{Binding ChartData}"
+                                           XBindingPath="Name"
+                                           YBindingPath="Count"
+                                           ShowDataLabels="True"
+                                           Fill="#4CAF50"/>
+                        </sf:SfCartesianChart.Series>
+                    </sf:SfCartesianChart>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- 统计摘要 -->
+            <Frame CornerRadius="12" Padding="12" BackgroundColor="#E8F5E9" IsVisible="{Binding ShowSummary}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="统计摘要" FontAttributes="Bold" FontSize="16" />
+                    <Label Text="{Binding SummaryText}" FontSize="14" LineBreakMode="WordWrap"/>
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

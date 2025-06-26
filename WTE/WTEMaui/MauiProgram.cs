@@ -83,6 +83,12 @@ namespace WTEMaui
                 serviceProvider.GetRequiredService<MealService>(),
                 serviceProvider.GetRequiredService<FoodRecommendationService>()));
 
+            builder.Services.AddTransient<StatisticPage>(serviceProvider =>
+            new StatisticPage(
+                serviceProvider.GetRequiredService<MealService>(),
+                serviceProvider.GetRequiredService<FoodService>(),
+                serviceProvider.GetRequiredService<TagService>()));
+
 #if DEBUG
             builder.Logging.AddDebug();
 #endif
