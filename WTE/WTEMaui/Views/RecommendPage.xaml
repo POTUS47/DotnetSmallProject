@@ -3,16 +3,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="WTEMaui.Views.RecommendPage"
              Title="推荐">
-    
-    <VerticalStackLayout Spacing="24" Padding="24">
-        <!-- 标题栏 -->
-        <Grid ColumnDefinitions="*,Auto">
-            <Label Text="想吃什么？" 
+
+	<VerticalStackLayout Spacing="24" Padding="24">
+		<!-- 标题栏 -->
+		<Grid ColumnDefinitions="*,Auto">
+			<Label Text="想吃什么？"
                    Grid.Column="0"
-                   FontSize="24" 
+                   FontSize="24"
                    HorizontalOptions="Start" />
-            
-            <Button Grid.Column="1"
+
+			<Button Grid.Column="1"
                     Text="⚙️"
                     BackgroundColor="Transparent"
                     TextColor="#512BD4"
@@ -20,14 +20,36 @@
                     WidthRequest="80"
                     HeightRequest="40"
                     Clicked="OnSettingsClicked"/>
-        </Grid>
-        
-        <Button Text="随机选一个" x:Name="RandomBtn" Clicked="OnRandomClicked" FontSize="20" />
-        <Button Text="吃健康点" x:Name="HealthyBtn" Clicked="OnHealthyClicked" FontSize="20" />
-        <Frame CornerRadius="12" Padding="16" BackgroundColor="#F5F5F5" IsVisible="{Binding HasResult}">
-            <Label Text="推荐结果" FontAttributes="Bold" FontSize="18" />
-            <Label Text="{Binding RecommendResult}" FontSize="20" />
-        </Frame>
-        <Label Text="{Binding StatusMsg}" FontSize="16" TextColor="Gray" />
-    </VerticalStackLayout>
+		</Grid>
+
+		<Button Text="随机选一个"
+                x:Name="RandomBtn"
+                Clicked="OnRandomClicked"
+                FontSize="20" />
+
+		<Button Text="吃健康点"
+                x:Name="HealthyBtn"
+                Clicked="OnHealthyClicked"
+                FontSize="20" />
+
+		<!-- 推荐结果展示 -->
+		<Frame CornerRadius="12"
+               Padding="16"
+               BackgroundColor="#F5F5F5"
+               IsVisible="{Binding HasResult}">
+			<VerticalStackLayout>
+				<Label Text="今日推荐："
+                       FontAttributes="Bold"
+                       FontSize="18" />
+				<Label Text="{Binding RecommendResult}"
+                       FontSize="24"
+                       TextColor="#512BD4" />
+			</VerticalStackLayout>
+		</Frame>
+
+		<!-- 状态信息 -->
+		<Label Text="{Binding StatusMsg}"
+               FontSize="16"
+               TextColor="Gray" />
+	</VerticalStackLayout>
 </ContentPage>
