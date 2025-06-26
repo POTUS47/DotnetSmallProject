@@ -15,6 +15,7 @@ namespace WTEMaui
         public static MauiApp CreateMauiApp()
         {
             var builder = MauiApp.CreateBuilder();
+#pragma warning disable MCT001 // `.UseMauiCommunityToolkit()` Not Found on MauiAppBuilder
             builder
                 .UseMauiApp<App>()
                 .ConfigureFonts(fonts =>
@@ -23,6 +24,7 @@ namespace WTEMaui
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 })
                 .ConfigureSyncfusionCore();
+#pragma warning restore MCT001 // `.UseMauiCommunityToolkit()` Not Found on MauiAppBuilder
 
             // 在 MauiProgram.cs 或 Program.cs 中
             builder.Services.AddDbContext<AppDbContext>(options =>

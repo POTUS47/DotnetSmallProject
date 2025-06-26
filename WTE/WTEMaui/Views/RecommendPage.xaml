@@ -8,7 +8,7 @@
 		<VerticalStackLayout Spacing="24" Padding="24">
 			<!-- 标题栏 -->
 			<Grid ColumnDefinitions="*,Auto">
-				<Label Text="想吃什么？"
+				<Label Text="大厨为你推荐"
                        Grid.Column="0"
                        FontSize="24"
                        HorizontalOptions="Start" />
@@ -18,8 +18,8 @@
                         BackgroundColor="Transparent"
                         TextColor="#512BD4"
                         FontSize="20"
-                        WidthRequest="80"
-                        HeightRequest="40"
+                        WidthRequest="90"
+                        HeightRequest="50"
                         Clicked="OnSettingsClicked"/>
 			</Grid>
 
