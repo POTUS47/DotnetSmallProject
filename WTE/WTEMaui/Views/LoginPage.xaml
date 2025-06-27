@@ -49,7 +49,8 @@
             </Frame>
 
             <!-- 登录按钮 -->
-            <Button Text="登录"
+            <Button x:Name="LoginButton"
+                    Text="登录"
                     FontSize="18"
                     FontAttributes="Bold"
                     TextColor="White"
@@ -65,6 +66,37 @@
                 </Button.Background>
             </Button>
 
+            <!-- 状态信息区域 -->
+            <StackLayout x:Name="StatusContainer" 
+                         HorizontalOptions="Center" 
+                         Orientation="Horizontal" 
+                         Spacing="10"
+                         IsVisible="False">
+                
+                <!-- 加载指示器 -->
+                <ActivityIndicator x:Name="LoadingIndicator"
+                                   IsRunning="False"
+                                   Color="#9FA8DA"
+                                   WidthRequest="20"
+                                   HeightRequest="20"
+                                   IsVisible="False" />
+                
+                <!-- 状态消息 -->
+                <Frame x:Name="StatusFrame"
+                       BackgroundColor="#F0F0F0"
+                       BorderColor="Transparent"
+                       CornerRadius="8"
+                       Padding="12,8"
+                       HasShadow="False">
+                    <Label x:Name="StatusLabel"
+                           Text=""
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                </Frame>
+            </StackLayout>
+
             <!-- 注册链接 -->
             <Label Text="还没有账号？点击注册"
                    TextColor="#667eea"
@@ -74,14 +106,6 @@
                     <TapGestureRecognizer Tapped="OnRegisterTapped" />
                 </Label.GestureRecognizers>
             </Label>
-
-            <!-- 状态信息 -->
-            <Label x:Name="StatusLabel"
-                   Text=""
-                   HorizontalOptions="Center"
-                   TextColor="Red"
-                   FontSize="14"
-                   IsVisible="False" />
 
         </VerticalStackLayout>
     </ScrollView>

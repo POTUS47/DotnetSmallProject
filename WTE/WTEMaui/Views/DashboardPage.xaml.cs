@@ -47,6 +47,7 @@ namespace WTEMaui.Views
 
             // 初始化UI状态
             LoadingIndicator.IsRunning = false;
+            LoadingIndicator.IsVisible = false;
             ResultFrame.IsVisible = false;
             PreviewImage.IsVisible = false;
             
@@ -61,6 +62,7 @@ namespace WTEMaui.Views
                 // 重置UI状态
                 ResultFrame.IsVisible = false;
                 LoadingIndicator.IsRunning = true;
+                LoadingIndicator.IsVisible = true;
 
                 // 检查权限
                 if (!await CheckAndRequestPermissions())
@@ -78,6 +80,7 @@ namespace WTEMaui.Views
                 if (photo == null) 
                 {
                     LoadingIndicator.IsRunning = false;
+                    LoadingIndicator.IsVisible = false;
                     return;
                 }
 
@@ -87,6 +90,7 @@ namespace WTEMaui.Views
             catch (Exception ex)
             {
                 LoadingIndicator.IsRunning = false;
+                LoadingIndicator.IsVisible = false;
                 _logger?.LogError(ex, "拍照失败");
                 await DisplayAlert("错误", $"拍照失败: {ex.Message}", "确定");
             }
@@ -102,12 +106,14 @@ namespace WTEMaui.Views
                 // 重置UI状态
                 ResultFrame.IsVisible = false;
                 LoadingIndicator.IsRunning = true;
+                LoadingIndicator.IsVisible = true;
 
                 // 检查权限
                 if (!await CheckAndRequestGalleryPermissions())
                 {
                     await DisplayAlert("权限不足", "需要访问相册权限才能使用此功能", "确定");
                     LoadingIndicator.IsRunning = false;
+                    LoadingIndicator.IsVisible = false;
                     return;
                 }
 
@@ -120,6 +126,7 @@ namespace WTEMaui.Views
                 if (photo == null) 
                 {
                     LoadingIndicator.IsRunning = false;
+                    LoadingIndicator.IsVisible = false;
                     return;
                 }
 
@@ -129,6 +136,7 @@ namespace WTEMaui.Views
             catch (Exception ex)
             {
                 LoadingIndicator.IsRunning = false;
+                LoadingIndicator.IsVisible = false;
                 _logger?.LogError(ex, "选择图片失败");
                 await DisplayAlert("错误", $"选择图片失败: {ex.Message}", "确定");
             }
@@ -164,6 +172,7 @@ namespace WTEMaui.Views
             catch (Exception ex)
             {
                 LoadingIndicator.IsRunning = false;
+                LoadingIndicator.IsVisible = false;
                 _logger?.LogError(ex, "处理选中照片失败");
                 throw;
             }
@@ -199,6 +208,7 @@ namespace WTEMaui.Views
             finally
             {
                 LoadingIndicator.IsRunning = false;
+                LoadingIndicator.IsVisible = false;
             }
         }
 
@@ -330,6 +340,7 @@ namespace WTEMaui.Views
             try
             {
                 LoadingIndicator.IsRunning = true;
+                LoadingIndicator.IsVisible = true;
 
                 // 获取当前用户ID
                 int currentUserId = App.CurrentUser?.UserId ?? 1; // 从当前登录用户获取，如果未登录则使用默认值
@@ -398,6 +409,7 @@ namespace WTEMaui.Views
             finally
             {
                 LoadingIndicator.IsRunning = false;
+                LoadingIndicator.IsVisible = false;
             }
         }
 

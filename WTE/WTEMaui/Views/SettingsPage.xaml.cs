@@ -44,6 +44,8 @@ namespace WTEMaui.Views
         public SettingsPage(UserService userService)
         {
             InitializeComponent();
+            // 双重确保导航栏隐藏
+            Shell.SetNavBarIsVisible(this, false);
             _userService = userService;
             // 先初始化所有属性
             UserName = "";

@@ -6,6 +6,7 @@
     xmlns:local="clr-namespace:WTEMaui"
     xmlns:views="clr-namespace:WTEMaui.Views"
     Shell.FlyoutBehavior="Disabled"
+    Shell.NavBarHasShadow="False"
     Title="WTEMaui">
 
     <ShellContent

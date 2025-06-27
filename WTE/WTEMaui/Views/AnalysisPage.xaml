@@ -3,49 +3,96 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:sf="clr-namespace:Syncfusion.Maui.Calendar;assembly=Syncfusion.Maui.Calendar"
              x:Class="WTEMaui.Views.AnalysisPage"
-             Title="分析">
+             Title=""
+             BackgroundColor="#F8FDF8">
     <ScrollView>
         <VerticalStackLayout Spacing="16" Padding="16">
             <!-- 用户信息 -->
-            <Frame CornerRadius="12" Padding="8" BackgroundColor="#F5F5F5">
+            <Frame CornerRadius="16" 
+                   Padding="16" 
+                   BackgroundColor="#E8F5E8"
+                   BorderColor="Transparent">
                 <Grid ColumnDefinitions="*,Auto">
                     <HorizontalStackLayout Grid.Column="0" Spacing="12">
-                        <Image Source="dotnet_bot.png" WidthRequest="48" HeightRequest="48" />
-                        <Label Text="{Binding UserName}" FontSize="20" VerticalOptions="Center" />
+                        <Image Source="login.png" 
+                               WidthRequest="48" 
+                               HeightRequest="48" />
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="{Binding UserName}" 
+                                   FontSize="20" 
+                                   FontAttributes="Bold"
+                                   TextColor="#2D5016"
+                                   VerticalOptions="Center" />
+                            <Label Text="的健康饮食分析"
+                                   FontSize="14"
+                                   TextColor="#7B9A5C"/>
+                        </VerticalStackLayout>
                     </HorizontalStackLayout>
                     
                     <Button Grid.Column="1"
                             Text="⚙️"
-                            BackgroundColor="Transparent"
-                            TextColor="#512BD4"
+                            BackgroundColor="#FFFFFF"
+                            TextColor="#2D5016"
                             FontSize="18"
-                            WidthRequest="80"
-                            HeightRequest="55"
+                            WidthRequest="50"
+                            HeightRequest="50"
+                            CornerRadius="22"
+                            BorderColor="#A8C090"
+                            BorderWidth="1"
                             Clicked="OnSettingsClicked"/>
                 </Grid>
             </Frame>
             
             <!-- 日历控件 -->
-            <Frame CornerRadius="12" Padding="8" BackgroundColor="White">
-                <sf:SfCalendar x:Name="FoodCalendar"
-                              View="Month"
-                              HeightRequest="250"
-                              CornerRadius="8"
-                              SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
-                              SelectionChanged="OnCalendarSelectionChanged"/>
+            <Frame CornerRadius="16" 
+                   Padding="12" 
+                   BackgroundColor="White"
+                   BorderColor="#E8F5E8">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="📅 饮食日历"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="#2D5016"/>
+                    <sf:SfCalendar x:Name="FoodCalendar"
+                                  View="Month"
+                                  HeightRequest="250"
+                                  CornerRadius="8"
+                                  SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
+                                  SelectionChanged="OnCalendarSelectionChanged"/>
+                </VerticalStackLayout>
             </Frame>
             
             <!-- 选中日期的食物详情 -->
-            <Frame CornerRadius="12" Padding="12" BackgroundColor="#F8F9FA">
-                <VerticalStackLayout Spacing="8">
-                    <Label Text="{Binding SelectedDate, StringFormat='选中日期: {0:yyyy-MM-dd}'}" 
-                           FontAttributes="Bold" 
-                           FontSize="16"/>
+            <Frame CornerRadius="16" 
+                   Padding="16" 
+                   BackgroundColor="White"
+                   BorderColor="#A8C090">
+                <VerticalStackLayout Spacing="12">
+                    <Grid ColumnDefinitions="Auto,*">
+                        <Label Grid.Column="0"
+                               Text="🍽️"
+                               FontSize="20"
+                               VerticalOptions="Center"
+                               Margin="0,0,8,0"/>
+                        <Label Grid.Column="1"
+                               Text="{Binding SelectedDate, StringFormat='选中日期: {0:yyyy-MM-dd}'}" 
+                               FontAttributes="Bold" 
+                               FontSize="16"
+                               TextColor="#2D5016"
+                               VerticalOptions="Center"/>
+                    </Grid>
+                    
                     <CollectionView ItemsSource="{Binding SelectedDayFoods}">
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
-                                <Frame Margin="10,1,10,5" Padding="8" BorderColor="#DDD" CornerRadius="6">
-                                    <Label Text="{Binding}" FontSize="14"/>
+                                <Frame Margin="0,4" 
+                                       Padding="12,8" 
+                                       BorderColor="#E8F5E8" 
+                                       CornerRadius="12"
+                                       BackgroundColor="#F8FDF8">
+                                    <Label Text="{Binding}" 
+                                           FontSize="14"
+                                           TextColor="#2D5016"/>
                                 </Frame>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
@@ -54,70 +101,120 @@
             </Frame>
             
             <!-- 健康建议 -->
-            <Frame CornerRadius="12" Padding="12" BackgroundColor="#E8F5E9">
-                <VerticalStackLayout Spacing="8">
-                    <Label Text="用餐时间规律分析" FontAttributes="Bold" FontSize="18" />
+            <Frame CornerRadius="16" 
+                   Padding="16" 
+                   BackgroundColor="White"
+                   BorderColor="#4CAF50">
+                <VerticalStackLayout Spacing="12">
+                    <Grid ColumnDefinitions="Auto,*">
+                        <Label Grid.Column="0"
+                               Text="⏰"
+                               FontSize="20"
+                               VerticalOptions="Center"
+                               Margin="0,0,8,0"/>
+                        <Label Grid.Column="1"
+                               Text="用餐时间规律分析" 
+                               FontAttributes="Bold" 
+                               FontSize="18"
+                               TextColor="#2D5016"
+                               VerticalOptions="Center"/>
+                    </Grid>
                     
                     <!-- 获取建议按钮 -->
                     <Button x:Name="GetAdviceButton"
-                            Text="获取用餐时间建议"
+                            Text="📊 获取用餐时间建议"
                             BackgroundColor="#4CAF50"
                             TextColor="White"
-                            CornerRadius="8"
+                            CornerRadius="12"
+                            HeightRequest="50"
+                            FontSize="16"
+                            FontAttributes="Bold"
                             Clicked="OnGetAdviceClicked"
                             IsVisible="{Binding ShowGetAdviceButton}"/>
                     
                     <!-- 加载指示器 -->
                     <StackLayout Orientation="Horizontal" 
-                                Spacing="10" 
+                                Spacing="12" 
                                 HorizontalOptions="Center"
                                 IsVisible="{Binding IsLoadingAdvice}">
                         <ActivityIndicator IsRunning="{Binding IsLoadingAdvice}" 
                                          Color="#4CAF50"/>
                         <Label Text="正在获取健康建议..." 
                                FontSize="14" 
+                               TextColor="#2D5016"
                                VerticalOptions="Center"/>
                     </StackLayout>
                     
                     <!-- 健康建议内容 -->
-                    <Label Text="{Binding HealthAdvice}" 
-                           FontSize="16" 
-                           LineBreakMode="WordWrap"
-                           IsVisible="{Binding ShowHealthAdvice}"/>
+                    <Frame BackgroundColor="#F8FDF8"
+                           BorderColor="#E8F5E8"
+                           CornerRadius="12"
+                           Padding="16"
+                           IsVisible="{Binding ShowHealthAdvice}">
+                        <Label Text="{Binding HealthAdvice}" 
+                               FontSize="16" 
+                               LineBreakMode="WordWrap"
+                               TextColor="#2D5016"/>
+                    </Frame>
                 </VerticalStackLayout>
             </Frame>
 
             <!-- 饮食健康分析 -->
-            <Frame CornerRadius="12" Padding="12" BackgroundColor="#E3F2FD">
-                <VerticalStackLayout Spacing="8">
-                    <Label Text="饮食健康分析" FontAttributes="Bold" FontSize="18" />
+            <Frame CornerRadius="16" 
+                   Padding="16" 
+                   BackgroundColor="White"
+                   BorderColor="#66BB6A">
+                <VerticalStackLayout Spacing="12">
+                    <Grid ColumnDefinitions="Auto,*">
+                        <Label Grid.Column="0"
+                               Text="🥗"
+                               FontSize="20"
+                               VerticalOptions="Center"
+                               Margin="0,0,8,0"/>
+                        <Label Grid.Column="1"
+                               Text="饮食健康分析" 
+                               FontAttributes="Bold" 
+                               FontSize="18"
+                               TextColor="#2D5016"
+                               VerticalOptions="Center"/>
+                    </Grid>
                     
                     <!-- 获取饮食健康分析按钮 -->
                     <Button x:Name="GetDietAnalysisButton"
-                            Text="获取饮食健康分析"
-                            BackgroundColor="#2196F3"
+                            Text="🔍 获取饮食健康分析"
+                            BackgroundColor="#66BB6A"
                             TextColor="White"
-                            CornerRadius="8"
+                            CornerRadius="12"
+                            HeightRequest="50"
+                            FontSize="16"
+                            FontAttributes="Bold"
                             Clicked="OnGetDietAnalysisClicked"
                             IsVisible="{Binding ShowGetDietAnalysisButton}"/>
                     
                     <!-- 加载指示器 -->
                     <StackLayout Orientation="Horizontal" 
-                                Spacing="10" 
+                                Spacing="12" 
                                 HorizontalOptions="Center"
                                 IsVisible="{Binding IsLoadingDietAnalysis}">
                         <ActivityIndicator IsRunning="{Binding IsLoadingDietAnalysis}" 
-                                         Color="#2196F3"/>
+                                         Color="#66BB6A"/>
                         <Label Text="正在分析饮食健康..." 
                                FontSize="14" 
+                               TextColor="#2D5016"
                                VerticalOptions="Center"/>
                     </StackLayout>
                     
                     <!-- 饮食健康分析内容 -->
-                    <Label Text="{Binding DietHealthAdvice}" 
-                           FontSize="16" 
-                           LineBreakMode="WordWrap"
-                           IsVisible="{Binding ShowDietHealthAdvice}"/>
+                    <Frame BackgroundColor="#F8FDF8"
+                           BorderColor="#E8F5E8"
+                           CornerRadius="12"
+                           Padding="16"
+                           IsVisible="{Binding ShowDietHealthAdvice}">
+                        <Label Text="{Binding DietHealthAdvice}" 
+                               FontSize="16" 
+                               LineBreakMode="WordWrap"
+                               TextColor="#2D5016"/>
+                    </Frame>
                 </VerticalStackLayout>
             </Frame>
 

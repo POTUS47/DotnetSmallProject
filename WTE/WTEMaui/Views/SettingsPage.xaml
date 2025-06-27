@@ -2,12 +2,16 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="WTEMaui.Views.SettingsPage"
-             Title="个人设置">
+             Title=""
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="#F8FDF8">
     
     <Grid RowDefinitions="Auto,*">
         <!-- 标题栏 -->
-        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" 
-              Padding="16" BackgroundColor="#512BD4">
+        <Grid Grid.Row="0" 
+              ColumnDefinitions="Auto,*,Auto" 
+              Padding="16" 
+              BackgroundColor="#4CAF50">
             <Button Grid.Column="0"
                     Text="←"
                     BackgroundColor="Transparent"
@@ -18,7 +22,7 @@
                     Clicked="OnBackClicked"/>
             
             <Label Grid.Column="1"
-                   Text="个人设置"
+                   Text="⚙️ 个人设置"
                    TextColor="White"
                    FontSize="18"
                    FontAttributes="Bold"
@@ -26,131 +30,342 @@
                    VerticalOptions="Center"/>
             
             <Button Grid.Column="2"
-                    Text="保存"
+                    Text="💾 保存"
                     BackgroundColor="Transparent"
                     TextColor="White"
                     FontSize="16"
-                    WidthRequest="80"
+                    WidthRequest="95"
                     HeightRequest="50"
                     Clicked="OnSaveClicked"/>
         </Grid>
         
         <!-- 内容区域 -->
         <ScrollView Grid.Row="1">
-            <VerticalStackLayout Spacing="20" Padding="20">
+            <VerticalStackLayout Spacing="16" Padding="20">
                 
                 <!-- 用户基本信息 -->
-                <Frame CornerRadius="12" Padding="16" BackgroundColor="#F8F9FA">
+                <Frame CornerRadius="16" 
+                       Padding="16" 
+                       BackgroundColor="#E8F5E8"
+                       BorderColor="Transparent">
                     <VerticalStackLayout Spacing="12">
-                        <Label Text="基本信息" FontAttributes="Bold" FontSize="18" />
+                        <Grid ColumnDefinitions="Auto,*">
+                            <Label Grid.Column="0"
+                                   Text="👤"
+                                   FontSize="20"
+                                   VerticalOptions="Center"
+                                   Margin="0,0,8,0"/>
+                            <Label Grid.Column="1"
+                                   Text="基本信息" 
+                                   FontAttributes="Bold" 
+                                   FontSize="18"
+                                   TextColor="#2D5016"
+                                   VerticalOptions="Center"/>
+                        </Grid>
                         
-                        <Label Text="{Binding UserName, StringFormat='用户名: {0}'}" FontSize="16" />
-                        <Label Text="{Binding UserEmail, StringFormat='邮箱: {0}'}" FontSize="16" />
+                        <Frame BackgroundColor="#F8FDF8"
+                               BorderColor="#A8C090"
+                               CornerRadius="12"
+                               Padding="12">
+                            <VerticalStackLayout Spacing="8">
+                                <Label Text="{Binding UserName, StringFormat='👨‍💼 用户名: {0}'}" 
+                                       FontSize="16"
+                                       TextColor="#2D5016" />
+                                <Label Text="{Binding UserEmail, StringFormat='📧 邮箱: {0}'}" 
+                                       FontSize="16"
+                                       TextColor="#2D5016" />
+                            </VerticalStackLayout>
+                        </Frame>
                     </VerticalStackLayout>
                 </Frame>
                 
                 <!-- 身体数据 -->
-                <Frame CornerRadius="12" Padding="16" BackgroundColor="White">
+                <Frame CornerRadius="16" 
+                       Padding="16" 
+                       BackgroundColor="White"
+                       BorderColor="#E8F5E8">
                     <VerticalStackLayout Spacing="12">
-                        <Label Text="身体数据" FontAttributes="Bold" FontSize="18" />
+                        <Grid ColumnDefinitions="Auto,*">
+                            <Label Grid.Column="0"
+                                   Text="📏"
+                                   FontSize="20"
+                                   VerticalOptions="Center"
+                                   Margin="0,0,8,0"/>
+                            <Label Grid.Column="1"
+                                   Text="身体数据" 
+                                   FontAttributes="Bold" 
+                                   FontSize="18"
+                                   TextColor="#2D5016"
+                                   VerticalOptions="Center"/>
+                        </Grid>
                         
-                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
-                            <VerticalStackLayout Grid.Column="0" Spacing="8">
-                                <Label Text="身高 (cm)" FontSize="14" />
-                                <Entry x:Name="HeightEntry" 
-                                       Text="{Binding Height}" 
-                                       Placeholder="请输入身高"
-                                       Keyboard="Numeric" />
-                            </VerticalStackLayout>
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                            <Frame Grid.Column="0"
+                                   BorderColor="#A8C090"
+                                   CornerRadius="12"
+                                   Padding="12"
+                                   BackgroundColor="#F8FDF8">
+                                <VerticalStackLayout Spacing="8">
+                                    <Label Text="📐 身高 (cm)" 
+                                           FontSize="14"
+                                           TextColor="#2D5016" />
+                                    <Entry x:Name="HeightEntry" 
+                                           Text="{Binding Height}" 
+                                           Placeholder="请输入身高"
+                                           Keyboard="Numeric"
+                                           TextColor="#2D5016"
+                                           BackgroundColor="White" />
+                                </VerticalStackLayout>
+                            </Frame>
                             
-                            <VerticalStackLayout Grid.Column="1" Spacing="8">
-                                <Label Text="体重 (kg)" FontSize="14" />
-                                <Entry x:Name="WeightEntry" 
-                                       Text="{Binding Weight}" 
-                                       Placeholder="请输入体重"
-                                       Keyboard="Numeric" />
-                            </VerticalStackLayout>
+                            <Frame Grid.Column="1"
+                                   BorderColor="#A8C090"
+                                   CornerRadius="12"
+                                   Padding="12"
+                                   BackgroundColor="#F8FDF8">
+                                <VerticalStackLayout Spacing="8">
+                                    <Label Text="⚖️ 体重 (kg)" 
+                                           FontSize="14"
+                                           TextColor="#2D5016" />
+                                    <Entry x:Name="WeightEntry" 
+                                           Text="{Binding Weight}" 
+                                           Placeholder="请输入体重"
+                                           Keyboard="Numeric"
+                                           TextColor="#2D5016"
+                                           BackgroundColor="White" />
+                                </VerticalStackLayout>
+                            </Frame>
                         </Grid>
                     </VerticalStackLayout>
                 </Frame>
                 
                 <!-- 健康目标 -->
-                <Frame CornerRadius="12" Padding="16" BackgroundColor="White">
+                <Frame CornerRadius="16" 
+                       Padding="16" 
+                       BackgroundColor="White"
+                       BorderColor="#66BB6A">
                     <VerticalStackLayout Spacing="12">
-                        <Label Text="健康目标" FontAttributes="Bold" FontSize="18" />
+                        <Grid ColumnDefinitions="Auto,*">
+                            <Label Grid.Column="0"
+                                   Text="🎯"
+                                   FontSize="20"
+                                   VerticalOptions="Center"
+                                   Margin="0,0,8,0"/>
+                            <Label Grid.Column="1"
+                                   Text="健康目标" 
+                                   FontAttributes="Bold" 
+                                   FontSize="18"
+                                   TextColor="#2D5016"
+                                   VerticalOptions="Center"/>
+                        </Grid>
                         
-                        <Label Text="请选择您的健康目标:" FontSize="14" />
-                        <Picker x:Name="HealthGoalPicker" 
-                                Title="选择健康目标"
-                                ItemsSource="{Binding HealthGoalOptions}"
-                                SelectedItem="{Binding SelectedHealthGoal, Mode=TwoWay}"
-                                SelectedIndexChanged="OnHealthGoalPickerChanged" />
-                        
-                        <Label Text="或自定义健康目标:" FontSize="14" 
-                               IsVisible="{Binding IsCustomHealthGoal}" />
-                        <Entry x:Name="CustomHealthGoalEntry" 
-                               Text="{Binding CustomHealthGoal}" 
-                               Placeholder="请输入您的健康目标"
-                               IsVisible="{Binding IsCustomHealthGoal}" />
+                        <Frame BackgroundColor="#F8FDF8"
+                               BorderColor="#E8F5E8"
+                               CornerRadius="12"
+                               Padding="12">
+                            <VerticalStackLayout Spacing="12">
+                                <Label Text="请选择您的健康目标:" 
+                                       FontSize="14"
+                                       TextColor="#2D5016" />
+                                <Picker x:Name="HealthGoalPicker" 
+                                        Title="选择健康目标"
+                                        ItemsSource="{Binding HealthGoalOptions}"
+                                        SelectedItem="{Binding SelectedHealthGoal, Mode=TwoWay}"
+                                        SelectedIndexChanged="OnHealthGoalPickerChanged"
+                                        TextColor="#2D5016"
+                                        BackgroundColor="White" />
+                                
+                                <Label Text="或自定义健康目标:" 
+                                       FontSize="14"
+                                       TextColor="#2D5016"
+                                       IsVisible="{Binding IsCustomHealthGoal}" />
+                                <Entry x:Name="CustomHealthGoalEntry" 
+                                       Text="{Binding CustomHealthGoal}" 
+                                       Placeholder="请输入您的健康目标"
+                                       IsVisible="{Binding IsCustomHealthGoal}"
+                                       TextColor="#2D5016"
+                                       BackgroundColor="White" />
+                            </VerticalStackLayout>
+                        </Frame>
                     </VerticalStackLayout>
                 </Frame>
                 
                 <!-- 过敏源 -->
-                <Frame CornerRadius="12" Padding="16" BackgroundColor="White">
+                <Frame CornerRadius="16" 
+                       Padding="16" 
+                       BackgroundColor="White"
+                       BorderColor="#81C784">
                     <VerticalStackLayout Spacing="12">
-                        <Label Text="过敏源" FontAttributes="Bold" FontSize="18" />
+                        <Grid ColumnDefinitions="Auto,*">
+                            <Label Grid.Column="0"
+                                   Text="⚠️"
+                                   FontSize="20"
+                                   VerticalOptions="Center"
+                                   Margin="0,0,8,0"/>
+                            <Label Grid.Column="1"
+                                   Text="过敏源管理" 
+                                   FontAttributes="Bold" 
+                                   FontSize="18"
+                                   TextColor="#2D5016"
+                                   VerticalOptions="Center"/>
+                        </Grid>
                         
-                        <Label Text="请选择您的过敏源 (可多选):" FontSize="14" />
-                        
-                        <!-- 过敏源复选框 -->
-                        <HorizontalStackLayout>
-                            <CheckBox IsChecked="{Binding Allergies.Peanut}" />
-                            <Label Text="花生" VerticalOptions="Center" />
-                        </HorizontalStackLayout>
-                        <HorizontalStackLayout>
-                            <CheckBox IsChecked="{Binding Allergies.Nuts}" />
-                            <Label Text="坚果" VerticalOptions="Center" />
-                        </HorizontalStackLayout>
-                        <HorizontalStackLayout>
-                            <CheckBox IsChecked="{Binding Allergies.Seafood}" />
-                            <Label Text="海鲜" VerticalOptions="Center" />
-                        </HorizontalStackLayout>
-                        <HorizontalStackLayout>
-                            <CheckBox IsChecked="{Binding Allergies.Eggs}" />
-                            <Label Text="鸡蛋" VerticalOptions="Center" />
-                        </HorizontalStackLayout>
-                        <HorizontalStackLayout>
-                            <CheckBox IsChecked="{Binding Allergies.Milk}" />
-                            <Label Text="牛奶" VerticalOptions="Center" />
-                        </HorizontalStackLayout>
-                        <HorizontalStackLayout>
-                            <CheckBox IsChecked="{Binding Allergies.Soy}" />
-                            <Label Text="大豆" VerticalOptions="Center" />
-                        </HorizontalStackLayout>
-                        <HorizontalStackLayout>
-                            <CheckBox IsChecked="{Binding Allergies.Wheat}" />
-                            <Label Text="小麦" VerticalOptions="Center" />
-                        </HorizontalStackLayout>
-                        <HorizontalStackLayout>
-                            <CheckBox IsChecked="{Binding Allergies.Other}" />
-                            <Label Text="其他" VerticalOptions="Center" />
-                        </HorizontalStackLayout>
-                        
-                        <Label Text="其他过敏源:" FontSize="14" 
-                               IsVisible="{Binding Allergies.Other}" />
-                        <Entry x:Name="OtherAllergiesEntry" 
-                               Text="{Binding OtherAllergiesText}" 
-                               Placeholder="请输入其他过敏源"
-                               IsVisible="{Binding Allergies.Other}" />
+                        <Frame BackgroundColor="#F8FDF8"
+                               BorderColor="#E8F5E8"
+                               CornerRadius="12"
+                               Padding="12">
+                            <VerticalStackLayout Spacing="12">
+                                <Label Text="请选择您的过敏源 (可多选):" 
+                                       FontSize="14"
+                                       TextColor="#2D5016" />
+                                
+                                <!-- 过敏源复选框 -->
+                                <Grid ColumnDefinitions="*,*" 
+                                      RowDefinitions="Auto,Auto,Auto,Auto" 
+                                      ColumnSpacing="8" 
+                                      RowSpacing="8">
+                                    <Frame Grid.Row="0" Grid.Column="0"
+                                           BackgroundColor="White"
+                                           BorderColor="#E8F5E8"
+                                           CornerRadius="8"
+                                           Padding="8">
+                                        <HorizontalStackLayout Spacing="8">
+                                            <CheckBox IsChecked="{Binding Allergies.Peanut}" />
+                                            <Label Text="🥜 花生" 
+                                                   VerticalOptions="Center"
+                                                   TextColor="#2D5016" />
+                                        </HorizontalStackLayout>
+                                    </Frame>
+                                    
+                                    <Frame Grid.Row="0" Grid.Column="1"
+                                           BackgroundColor="White"
+                                           BorderColor="#E8F5E8"
+                                           CornerRadius="8"
+                                           Padding="8">
+                                        <HorizontalStackLayout Spacing="8">
+                                            <CheckBox IsChecked="{Binding Allergies.Nuts}" />
+                                            <Label Text="🌰 坚果" 
+                                                   VerticalOptions="Center"
+                                                   TextColor="#2D5016" />
+                                        </HorizontalStackLayout>
+                                    </Frame>
+                                    
+                                    <Frame Grid.Row="1" Grid.Column="0"
+                                           BackgroundColor="White"
+                                           BorderColor="#E8F5E8"
+                                           CornerRadius="8"
+                                           Padding="8">
+                                        <HorizontalStackLayout Spacing="8">
+                                            <CheckBox IsChecked="{Binding Allergies.Seafood}" />
+                                            <Label Text="🦐 海鲜" 
+                                                   VerticalOptions="Center"
+                                                   TextColor="#2D5016" />
+                                        </HorizontalStackLayout>
+                                    </Frame>
+                                    
+                                    <Frame Grid.Row="1" Grid.Column="1"
+                                           BackgroundColor="White"
+                                           BorderColor="#E8F5E8"
+                                           CornerRadius="8"
+                                           Padding="8">
+                                        <HorizontalStackLayout Spacing="8">
+                                            <CheckBox IsChecked="{Binding Allergies.Eggs}" />
+                                            <Label Text="🥚 鸡蛋" 
+                                                   VerticalOptions="Center"
+                                                   TextColor="#2D5016" />
+                                        </HorizontalStackLayout>
+                                    </Frame>
+                                    
+                                    <Frame Grid.Row="2" Grid.Column="0"
+                                           BackgroundColor="White"
+                                           BorderColor="#E8F5E8"
+                                           CornerRadius="8"
+                                           Padding="8">
+                                        <HorizontalStackLayout Spacing="8">
+                                            <CheckBox IsChecked="{Binding Allergies.Milk}" />
+                                            <Label Text="🥛 牛奶" 
+                                                   VerticalOptions="Center"
+                                                   TextColor="#2D5016" />
+                                        </HorizontalStackLayout>
+                                    </Frame>
+                                    
+                                    <Frame Grid.Row="2" Grid.Column="1"
+                                           BackgroundColor="White"
+                                           BorderColor="#E8F5E8"
+                                           CornerRadius="8"
+                                           Padding="8">
+                                        <HorizontalStackLayout Spacing="8">
+                                            <CheckBox IsChecked="{Binding Allergies.Soy}" />
+                                            <Label Text="🫘 大豆" 
+                                                   VerticalOptions="Center"
+                                                   TextColor="#2D5016" />
+                                        </HorizontalStackLayout>
+                                    </Frame>
+                                    
+                                    <Frame Grid.Row="3" Grid.Column="0"
+                                           BackgroundColor="White"
+                                           BorderColor="#E8F5E8"
+                                           CornerRadius="8"
+                                           Padding="8">
+                                        <HorizontalStackLayout Spacing="8">
+                                            <CheckBox IsChecked="{Binding Allergies.Wheat}" />
+                                            <Label Text="🌾 小麦" 
+                                                   VerticalOptions="Center"
+                                                   TextColor="#2D5016" />
+                                        </HorizontalStackLayout>
+                                    </Frame>
+                                    
+                                    <Frame Grid.Row="3" Grid.Column="1"
+                                           BackgroundColor="White"
+                                           BorderColor="#E8F5E8"
+                                           CornerRadius="8"
+                                           Padding="8">
+                                        <HorizontalStackLayout Spacing="8">
+                                            <CheckBox IsChecked="{Binding Allergies.Other}" />
+                                            <Label Text="❓ 其他" 
+                                                   VerticalOptions="Center"
+                                                   TextColor="#2D5016" />
+                                        </HorizontalStackLayout>
+                                    </Frame>
+                                </Grid>
+                                
+                                <VerticalStackLayout Spacing="8" 
+                                                     IsVisible="{Binding Allergies.Other}">
+                                    <Label Text="其他过敏源:" 
+                                           FontSize="14"
+                                           TextColor="#2D5016" />
+                                    <Entry x:Name="OtherAllergiesEntry" 
+                                           Text="{Binding OtherAllergiesText}" 
+                                           Placeholder="请输入其他过敏源"
+                                           TextColor="#2D5016"
+                                           BackgroundColor="White" />
+                                </VerticalStackLayout>
+                            </VerticalStackLayout>
+                        </Frame>
                     </VerticalStackLayout>
                 </Frame>
                 
                 <!-- 加载指示器 -->
-                <ActivityIndicator x:Name="LoadingIndicator"
-                                  IsRunning="False"
-                                  IsVisible="False"
-                                  HorizontalOptions="Center" />
+                <Frame CornerRadius="16"
+                       Padding="20"
+                       BackgroundColor="White"
+                       BorderColor="#E8F5E8"
+                       IsVisible="{Binding Source={x:Reference LoadingIndicator}, Path=IsVisible}">
+                    <StackLayout Orientation="Horizontal" 
+                                Spacing="12" 
+                                HorizontalOptions="Center">
+                        <ActivityIndicator x:Name="LoadingIndicator"
+                                          IsRunning="False"
+                                          IsVisible="False"
+                                          Color="#4CAF50" />
+                        <Label Text="正在保存设置..." 
+                               FontSize="16" 
+                               TextColor="#2D5016"
+                               VerticalOptions="Center"
+                               IsVisible="{Binding Source={x:Reference LoadingIndicator}, Path=IsVisible}"/>
+                    </StackLayout>
+                </Frame>
             </VerticalStackLayout>
         </ScrollView>
     </Grid>
-</ContentPage> 
+</ContentPage>

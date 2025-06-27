@@ -8,7 +8,7 @@
         <VerticalStackLayout Padding="30,0" Spacing="25">
             
             <!-- Logo -->
-            <Image Source="dotnet_bot.png"
+            <Image Source="login.png"
                    HeightRequest="100"
                    Aspect="AspectFit"
                    HorizontalOptions="Center"

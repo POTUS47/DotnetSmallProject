@@ -2,36 +2,101 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="WTEMaui.Views.RecommendPage"
-             Title="推荐">
+             Title="">
 
 	<ScrollView>
 		<VerticalStackLayout Spacing="24" Padding="24">
-			<!-- 标题栏 -->
-			<Grid ColumnDefinitions="*,Auto">
-				<Label Text="想吃什么？"
-                       Grid.Column="0"
-                       FontSize="24"
-                       HorizontalOptions="Start" />
+			<!-- 美化后的标题区域 -->
+			<Frame BackgroundColor="#F8F9FA" 
+			       CornerRadius="16" 
+			       Padding="20" 
+			       HasShadow="False"
+			       BorderColor="#E9ECEF">
+				<Grid ColumnDefinitions="*,Auto" RowSpacing="8">
+					<!-- 主标题 -->
+					<VerticalStackLayout Grid.Column="0" Spacing="4">
+						<Label Text="🍽️ 美食推荐"
+						       FontSize="24"
+						       FontAttributes="Bold"
+						       TextColor="#2D3748" />
+						<Label Text="不知道吃什么？
+                               让我来帮你选择！"
+						       FontSize="14"
+						       TextColor="#718096"
+						       LineBreakMode="WordWrap" />
+					</VerticalStackLayout>
 
-				<Button Grid.Column="1"
-                        Text="⚙️"
-                        BackgroundColor="Transparent"
-                        TextColor="#512BD4"
-                        FontSize="20"
-                        WidthRequest="80"
-                        HeightRequest="40"
-                        Clicked="OnSettingsClicked"/>
-			</Grid>
+					<!-- 设置按钮 -->
+					<Frame Grid.Column="1"
+					       BackgroundColor="White"
+					       CornerRadius="20"
+					       Padding="8"
+					       HasShadow="False"
+					       BorderColor="#E0E0E0"
+					       WidthRequest="50"
+					       HeightRequest="50">
+						<Button Text="⚙️"
+						        BackgroundColor="Transparent"
+						        TextColor="#667eea"
+						        FontSize="18"
+						        Clicked="OnSettingsClicked"
+						        Padding="0" />
+					</Frame>
+				</Grid>
+			</Frame>
 
-			<Button Text="随机选一个"
-                    x:Name="RandomBtn"
-                    Clicked="OnRandomClicked"
-                    FontSize="20" />
+			<!-- 美化后的按钮组 -->
+			<VerticalStackLayout Spacing="16">
+				<!-- 随机推荐按钮 -->
+				<Frame HasShadow="True" 
+				       CornerRadius="16" 
+				       Padding="0" 
+				       BackgroundColor="Transparent">
+					<Button x:Name="RandomBtn"
+					        Clicked="OnRandomClicked"
+					        FontSize="18"
+					        FontAttributes="Bold"
+					        TextColor="White"
+					        CornerRadius="16"
+					        HeightRequest="70"
+					        Padding="20">
+						<Button.Background>
+							<LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+								<GradientStop Color="#FF6B6B" Offset="0.0" />
+								<GradientStop Color="#FF8E8E" Offset="1.0" />
+							</LinearGradientBrush>
+						</Button.Background>
+						<Button.Text>
+							🎲 随机选一个
+						</Button.Text>
+					</Button>
+				</Frame>
 
-			<Button Text="吃健康点"
-                    x:Name="HealthyBtn"
-                    Clicked="OnHealthyClicked"
-                    FontSize="20" />
+				<!-- 健康推荐按钮 -->
+				<Frame HasShadow="True" 
+				       CornerRadius="16" 
+				       Padding="0" 
+				       BackgroundColor="Transparent">
+					<Button x:Name="HealthyBtn"
+					        Clicked="OnHealthyClicked"
+					        FontSize="18"
+					        FontAttributes="Bold"
+					        TextColor="White"
+					        CornerRadius="16"
+					        HeightRequest="70"
+					        Padding="20">
+						<Button.Background>
+							<LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+								<GradientStop Color="#4ECDC4" Offset="0.0" />
+								<GradientStop Color="#44A08D" Offset="1.0" />
+							</LinearGradientBrush>
+						</Button.Background>
+						<Button.Text>
+							🥗 吃健康点
+						</Button.Text>
+					</Button>
+				</Frame>
+			</VerticalStackLayout>
 
 			<!-- 动画加载区域 -->
 			<Grid x:Name="AnimationContainer" 
@@ -62,7 +127,7 @@
 						
 						<!-- 外圈旋转动画 -->
 						<Ellipse x:Name="OuterRing"
-                                 Stroke="#512BD4"
+                                 Stroke="#667eea"
                                  StrokeThickness="4"
                                  WidthRequest="120"
                                  HeightRequest="120"
@@ -87,7 +152,8 @@
                                HorizontalOptions="Center"
                                VerticalOptions="End"
                                Margin="0,0,0,40"
-                               TextColor="#512BD4" />
+                               TextColor="#4A5568"
+                               FontAttributes="Bold" />
 					</Grid>
 				</Frame>
 			</Grid>
@@ -98,7 +164,7 @@
                        Padding="20"
                        HasShadow="True"
                        BackgroundColor="White"
-                       BorderColor="#512BD4"
+                       BorderColor="#667eea"
                        x:Name="ResultFrame">
 					<VerticalStackLayout Spacing="15">
 						<!-- 庆祝动画 -->
@@ -112,7 +178,7 @@
                                FontAttributes="Bold"
                                FontSize="20"
                                HorizontalOptions="Center"
-                               TextColor="#512BD4"
+                               TextColor="#667eea"
                                Margin="0,5,0,10" />
 						
 						<!-- 推荐菜名 -->
@@ -121,12 +187,12 @@
                                FontSize="36"
                                FontAttributes="Bold"
                                HorizontalOptions="Center"
-                               TextColor="#FF6B6B"
+                               TextColor="#EC407A"
                                Margin="0,5,0,15" />
 						
 						<!-- 分隔线 -->
 						<BoxView HeightRequest="1"
-                                 BackgroundColor="#E0E0E0"
+                                 BackgroundColor="#E2E8F0"
                                  HorizontalOptions="Fill"
                                  Margin="10,0" />
 						
@@ -134,7 +200,7 @@
 						<Label Text="🌟 推荐理由"
                                FontSize="16"
                                FontAttributes="Bold"
-                               TextColor="#512BD4"
+                               TextColor="#667eea"
                                HorizontalOptions="Start"
                                Margin="5,5,0,5" />
 						
@@ -142,7 +208,7 @@
 						<Label x:Name="RecommendReasonLabel"
                                Text="{Binding RecommendReason}"
                                FontSize="16"
-                               TextColor="#333333"
+                               TextColor="#2D3748"
                                HorizontalOptions="Start"
                                LineBreakMode="WordWrap"
                                Margin="5,0,5,10" />
@@ -163,7 +229,8 @@
 			<!-- 状态信息 -->
 			<Label Text="{Binding StatusMsg}"
                    FontSize="16"
-                   TextColor="Gray"
+                   TextColor="#A0AEC0"
+                   FontAttributes="Italic"
                    HorizontalOptions="Center" />
 			
 			<!-- 底部间距，确保内容不会被遮挡 -->

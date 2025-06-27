@@ -3,15 +3,43 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:views="clr-namespace:WTEMaui.Views"
-    x:Class="WTEMaui.MainTabShell">
+    x:Class="WTEMaui.MainTabShell"
+    FlyoutBehavior="Disabled">
+
+    <Shell.Resources>
+        <ResourceDictionary>
+            <!-- 健康饮食主题配色 -->
+            <Style TargetType="TabBar">
+                <Setter Property="Shell.BackgroundColor" Value="#F8FDF8" />
+                <Setter Property="Shell.ForegroundColor" Value="#2D5016" />
+                <Setter Property="Shell.TitleColor" Value="#2D5016" />
+                <Setter Property="Shell.DisabledColor" Value="#A8C090" />
+                <Setter Property="Shell.UnselectedColor" Value="#7B9A5C" />
+                <Setter Property="Shell.TabBarBackgroundColor" Value="#E8F5E8" />
+                <Setter Property="Shell.TabBarForegroundColor" Value="#2D5016" />
+                <Setter Property="Shell.TabBarTitleColor" Value="#2D5016" />
+                <Setter Property="Shell.TabBarUnselectedColor" Value="#7B9A5C" />
+            </Style>
+        </ResourceDictionary>
+    </Shell.Resources>
 
     <TabBar>
-        <ShellContent Title="推荐" Icon="heart.png" ContentTemplate="{DataTemplate views:RecommendPage}" />
-        <ShellContent Title="首页" Icon="home.png" ContentTemplate="{DataTemplate views:DashboardPage}" />
-        <ShellContent Title="分析" Icon="chart.png" ContentTemplate="{DataTemplate views:AnalysisPage}" />
-        <ShellContent Title="统计"
-                Icon="chart.png"
-                ContentTemplate="{DataTemplate views:StatisticPage}"/>
+        <ShellContent 
+            Title="推荐" 
+            Icon="heart.png" 
+            ContentTemplate="{DataTemplate views:RecommendPage}" />
+        <ShellContent 
+            Title="首页" 
+            Icon="home.png" 
+            ContentTemplate="{DataTemplate views:DashboardPage}" />
+        <ShellContent 
+            Title="分析" 
+            Icon="llm.png" 
+            ContentTemplate="{DataTemplate views:AnalysisPage}" />
+        <ShellContent 
+            Title="统计"
+            Icon="chart.png"
+            ContentTemplate="{DataTemplate views:StatisticPage}"/>
     </TabBar>
 
     <!-- 设置页面路由 -->
