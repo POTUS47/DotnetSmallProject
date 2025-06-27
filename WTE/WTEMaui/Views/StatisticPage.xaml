@@ -117,7 +117,7 @@
                         <sf:SfCartesianChart.XAxes>
                             <sf:CategoryAxis/>
                         </sf:SfCartesianChart.XAxes>
-                        <sf:SfCartesianChart.YAxes>
+                        <sf:SfCartesianChart.YAxes> 
                             <sf:NumericalAxis/>
                         </sf:SfCartesianChart.YAxes>
                         <sf:SfCartesianChart.Series>

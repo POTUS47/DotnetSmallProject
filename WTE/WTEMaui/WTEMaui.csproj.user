@@ -5,8 +5,8 @@
     <ActiveDebugFramework>net8.0-android</ActiveDebugFramework>
     <ActiveDebugProfile>Android Emulator</ActiveDebugProfile>
     <ActiveDebugFramework>net8.0-android</ActiveDebugFramework>
-    <ActiveDebugProfile>Android Emulator</ActiveDebugProfile>
-    <SelectedPlatformGroup>Emulator</SelectedPlatformGroup>
+    <ActiveDebugProfile>HUAWEI ABR-AL60 (Android 12.0 - API 31)</ActiveDebugProfile>
+    <SelectedPlatformGroup>PhysicalDevice</SelectedPlatformGroup>
     <DefaultDevice>pixel_7_-_api_34</DefaultDevice>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-android|AnyCPU'">
